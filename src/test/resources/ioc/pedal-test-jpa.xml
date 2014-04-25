@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- Ensure java-proxies are not created but classes are enhanced instead. -->
+	<tx:annotation-driven transaction-manager="tx" proxy-target-class="true" />
+
+<!-- 	<bean class="com.eclecticlogic.pedal.test.SchemaSwitchingPropertyPlaceholderConfigurer" /> -->
+
+	<!-- BoneCP is a high-performance database connection pool provider that is JDBC4 compliant (unlike c3p0). -->
+	<!-- Note: You can use Spring's property placeholder configuration mechanism to externalize much of this. -->
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+		<property name="driverClass" value="org.postgresql.Driver" />
+
+		<property name="jdbcUrl" value="jdbc:postgresql://localhost/pedal" />
+		<property name="username" value="postgres" />
+		<property name="password" value="postgres" />
+
+		<!-- Connection pool configuration -->
+		<property name="partitionCount" value="3" />
+		<property name="minConnectionsPerPartition" value="5" />
+		<property name="maxConnectionsPerPartition" value="5" />
+
+		<property name="idleMaxAgeInMinutes" value="60" />
+		<property name="acquireIncrement" value="5" />
+
+		<property name="statementsCacheSize" value="100" />
+		<property name="idleConnectionTestPeriodInMinutes" value="15" />
+		<property name="connectionTestStatement" value="select 1" />
+	</bean>
+
+	<bean id="pum" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+		<property name="persistenceXmlLocations">
+			<list>
+				<value>classpath:META-INF/pedal-test-persistence.xml</value>
+			</list>
+		</property>
+		<property name="defaultDataSource" ref="dataSource" />
+	</bean>
+
+	<!-- <bean id="hibernateInterceptor" class="FQCN of Spring managed hibernate interceptor." /> -->
+
+	<bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitManager" ref="pum" />
+		<property name="persistenceUnitName" value="pedal-test" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.ejb.cfgfile">META-INF/pedal-test-hibernate.cfg.xml</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</prop>
+				<!-- Don't auto-discover entity classes. Control freak! -->
+				<prop key="hibernate.archive.autodetection">none</prop>
+
+				<!-- Stops a contextual LOG creation check and related exception at startup. -->
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+				<!-- Uncomment to setup interceptors. -->
+				<!-- <prop key="hibernate.ejb.interceptor">fqcn of EmptyInterceptor derivative</prop> -->
+
+				<prop key="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
+				</prop>
+				<prop key="javax.persistence.schema-generation.database.action">drop-and-create</prop>
+				<prop key="javax.persistence.schema-generation.create-source">script-then-metadata</prop>
+				<prop key="javax.persistence.schema-generation.drop-source">script</prop>
+				<prop key="javax.persistence.schema-generation.create-script-source">src/test/scripts/${test.createScript}</prop>
+				<prop key="javax.persistence.schema-generation.drop-script-source">src/test/scripts/${test.dropScript}</prop>
+				<prop key="javax.persistence.sql-load-script-source">initialization.sql</prop>
+
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<!-- Use this to switch the schema -->
+				<prop key="hibernate.default_schema">${test.schemaName}</prop>
+			</props>
+		</property>
+		<property name="jpaPropertyMap">
+			<map>
+				<!-- <entry key="hibernate.ejb.interceptor" value-ref="hibernateInterceptor" /> -->
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hibernateProviderAccess" class="com.eclecticlogic.pedal.provider.hibernate.HibernateProviderAccessSpiImpl">
+		<property name="entityManagerFactory" ref="emf" />
+	</bean>
+
+	<bean id="tx" class="com.eclecticlogic.pedal.impl.JPATransactionWrapper">
+		<property name="entityManagerFactory" ref="emf" />
+		<property name="providerAccessSpi" ref="hibernateProviderAccess" />
+	</bean>
+
+
+</beans>

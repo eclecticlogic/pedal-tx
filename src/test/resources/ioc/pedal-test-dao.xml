@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- Note: While you can setup a context auto-scan to pick up the daos, if you have multi-database deployments, -->
+	<!-- it is easier to setup explicit associations of DAOs to transactions/entity-manager-factories. -->
+	<bean id="daoRegistry" class="com.eclecticlogic.pedal.dm.internal.DAORegistryImpl">
+		<property name="transaction" ref="tx" />
+		<property name="entityManagerFactory" ref="emf" />
+	</bean>
+
+	<!-- Sample way to configure autoscan for daos when using only a single database (majority of apps). -->
+	<!-- <context:component-scan base-package="com.eclecticlogic.pedal.test.dm.dao" /> -->
+
+	<bean id="abstractDAO" abstract="true" class="com.eclecticlogic.pedal.test.dm.dao.TestDAO">
+		<property name="transaction" ref="tx" />
+		<property name="providerAccess" ref="hibernateProviderAccess" />
+		<property name="entityManagerFactory" ref="emf" />
+	</bean>
+
+	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO" />
+	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.StudentDAO" />
+	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.EmployeeDAO" />
+</beans>

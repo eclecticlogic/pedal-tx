@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hibernate-configuration xmlns="http://www.hibernate.org/xsd/hibernate-configuration"
+	xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-configuration hibernate-configuration-4.0.xsd" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!-- Define the hibernate classes here. -->
+	<session-factory>
+		<mapping class="com.eclecticlogic.pedal.test.dm.Manufacturer" />
+		<mapping class="com.eclecticlogic.pedal.test.dm.Student" />
+		<mapping class="com.eclecticlogic.pedal.test.dm.Employee" />
+	</session-factory>
+
+</hibernate-configuration>
