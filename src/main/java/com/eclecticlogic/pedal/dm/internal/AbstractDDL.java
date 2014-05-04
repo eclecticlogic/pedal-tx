@@ -20,12 +20,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 
-import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.Transaction;
 
 /**
@@ -34,6 +34,7 @@ import com.eclecticlogic.pedal.Transaction;
  */
 public class AbstractDDL<E extends Serializable> {
 
+    private EntityManager entityManager;
     private Transaction transaction;
 
     private enum QueryType {
@@ -70,9 +71,19 @@ public class AbstractDDL<E extends Serializable> {
     private List<Binding> bindings = new ArrayList<>();
 
 
-    protected AbstractDDL(Transaction transaction) {
-        super();
+    protected AbstractDDL(EntityManager entityManager, Transaction transaction) {
+        this.entityManager = entityManager;
         this.transaction = transaction;
+    }
+
+
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+
+    protected Transaction getTransaction() {
+        return transaction;
     }
 
 
@@ -83,11 +94,6 @@ public class AbstractDDL<E extends Serializable> {
 
     protected void setLockModeType(LockModeType lockModeType) {
         this.lockModeType = lockModeType;
-    }
-
-
-    protected Transaction getTransaction() {
-        return transaction;
     }
 
 
@@ -115,20 +121,20 @@ public class AbstractDDL<E extends Serializable> {
     }
 
 
-    protected Query getQuery(Context context) {
+    protected Query getQuery() {
         Query q = null;
         switch (queryType) {
             case NATIVE:
-                q = context.getEntityManager().createNativeQuery(queryString);
+                q = getEntityManager().createNativeQuery(queryString);
                 break;
             case STRING:
-                q = context.getEntityManager().createQuery(queryString);
+                q = getEntityManager().createQuery(queryString);
                 break;
             case TYPED:
                 q = queryTyped;
                 break;
             case CRITERIA:
-                q = context.getEntityManager().createQuery(queryCriteria);
+                q = getEntityManager().createQuery(queryCriteria);
                 break;
         }
         for (Binding binding : bindings) {

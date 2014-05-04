@@ -21,11 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.Select;
 
@@ -35,8 +35,8 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
     private int firstResult;
 
 
-    public SelectImpl(Transaction transaction) {
-        super(transaction);
+    public SelectImpl(EntityManager entityManager, Transaction transaction) {
+        super(entityManager, transaction);
     }
 
 
@@ -69,7 +69,7 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
         getBindings().add(new Binding(param, value));
         return this;
     }
-    
+
 
     @Override
     public Select<E> using(LockModeType lock) {
@@ -79,8 +79,8 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
 
 
     @Override
-    protected Query getQuery(Context context) {
-        Query query = super.getQuery(context);
+    protected Query getQuery() {
+        Query query = super.getQuery();
 
         if (getMaxResults() > 0) {
             query.setMaxResults(getMaxResults());
@@ -95,10 +95,8 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
     @SuppressWarnings("unchecked")
     @Override
     public List<E> list() {
-        return getTransaction().exec((context) -> {
-            Query query = getQuery(context);
-            return query.getResultList();
-        });
+        Query query = getQuery();
+        return query.getResultList();
     }
 
 
@@ -112,28 +110,24 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
     @SuppressWarnings("unchecked")
     @Override
     public <R> Optional<R> scalar() {
-        return getTransaction().exec((context) -> {
-            try {
-                Query query = getQuery(context);
-                return Optional.ofNullable((R) query.getSingleResult());
-            } catch (NoResultException e) {
-                return null;
-            }
-        });
+        try {
+            Query query = getQuery();
+            return Optional.ofNullable((R) query.getSingleResult());
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public <R> List<R> scalarList() {
-        return getTransaction().exec((context) -> {
-            try {
-                Query query = getQuery(context);
-                return (List<R>) query.getResultList();
-            } catch (NoResultException e) {
-                return Collections.EMPTY_LIST;
-            }
-        });
+        try {
+            Query query = getQuery();
+            return (List<R>) query.getResultList();
+        } catch (NoResultException e) {
+            return Collections.EMPTY_LIST;
+        }
     }
 
 }

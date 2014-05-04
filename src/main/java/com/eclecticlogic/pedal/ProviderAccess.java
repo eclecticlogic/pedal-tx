@@ -18,8 +18,6 @@ package com.eclecticlogic.pedal;
 
 import java.io.Serializable;
 
-
-
 /**
  * Access to provider specific implementations of features that are not part of standard JPA.
  *  
@@ -32,10 +30,12 @@ public interface ProviderAccess {
      * @return Name of schema connected to. Empty string is the schema name is the default one.
      */
     public String getSchemaName();
-    
+
+
     /**
      * @param entityClass Entity class
      * @return Name of table.
      */
     public String getTableName(Class<? extends Serializable> entityClass);
+
 }

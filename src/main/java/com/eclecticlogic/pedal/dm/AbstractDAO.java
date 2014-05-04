@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -30,7 +30,6 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.ProviderAccess;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.internal.SelectImpl;
@@ -39,8 +38,18 @@ import com.eclecticlogic.pedal.dm.internal.UpdateImpl;
 public abstract class AbstractDAO<E extends Serializable, P extends Serializable> implements DAO<E, P>, DAOMeta<E, P> {
 
     private Transaction transaction;
+    private EntityManager entityManager;
     private ProviderAccess providerAccess;
-    private EntityManagerFactory entityManagerFactory;
+
+
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
 
     protected Transaction getTransaction() {
@@ -50,16 +59,6 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
-    }
-
-
-    protected EntityManagerFactory getEntityManagerFactory() {
-        return entityManagerFactory;
-    }
-
-
-    public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
     }
 
 
@@ -80,14 +79,14 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public EntityType<E> getEntityType() {
-        return getEntityManagerFactory().getMetamodel().entity(getEntityClass());
+        return getEntityManager().getEntityManagerFactory().getMetamodel().entity(getEntityClass());
     }
 
 
     @Override
     public E create(final E entity) {
-        return getTransaction().exec((context) -> {
-            context.getEntityManager().persist(entity);
+        return getTransaction().exec(() -> {
+            getEntityManager().persist(entity);
             return entity;
         });
     }
@@ -108,8 +107,8 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public Optional<E> findById(final P id) {
-        return getTransaction().exec((context) -> {
-            return Optional.ofNullable(context.getEntityManager().find(getEntityClass(), id));
+        return getTransaction().exec(() -> {
+            return Optional.ofNullable(getEntityManager().find(getEntityClass(), id));
         });
     }
 
@@ -118,11 +117,11 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     @Override
     public List<E> findById(final P... ids) {
         return getTransaction().exec((context) -> {
-            CriteriaBuilder builder = context.getEntityManager().getCriteriaBuilder();
+            CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
             CriteriaQuery<E> cq = builder.createQuery(getEntityClass());
             Root<E> root = cq.from(getEntityClass());
             cq.select(root).where(builder.in(root.get(getIdProperty())).in((Object[]) ids));
-            TypedQuery<E> query = context.getEntityManager().createQuery(cq);
+            TypedQuery<E> query = getEntityManager().createQuery(cq);
             return query.getResultList();
         });
     }
@@ -143,9 +142,9 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public E update(final E entity) {
-        return getTransaction().exec((context) -> {
-            E t = context.getEntityManager().merge(entity);
-            context.getEntityManager().persist(t);
+        return getTransaction().exec(() -> {
+            E t = getEntityManager().merge(entity);
+            getEntityManager().persist(t);
             return t;
         });
     }
@@ -166,9 +165,9 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public E delete(final E entity) {
-        return getTransaction().exec((context) -> {
-            E mergedObject = context.getEntityManager().merge(entity);
-            context.getEntityManager().remove(mergedObject);
+        return getTransaction().exec(() -> {
+            E mergedObject = getEntityManager().merge(entity);
+            getEntityManager().remove(mergedObject);
             return mergedObject;
         });
     }
@@ -189,78 +188,76 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public E lock(final E entity, final LockModeType lockMode) {
-        return getTransaction().exec((context) -> {
-            context.getEntityManager().lock(entity, lockMode);
-            context.getEntityManager().detach(entity);
-            E merged = context.getEntityManager().merge(entity);
-            context.getEntityManager().flush();
+        return getTransaction().exec(() -> {
+            getEntityManager().lock(entity, lockMode);
+            getEntityManager().detach(entity);
+            E merged = getEntityManager().merge(entity);
+            getEntityManager().flush();
             return merged;
         });
     }
 
 
     protected Select<E> select(String query, boolean nativeQuery) {
-        SelectImpl<E> select = new SelectImpl<E>(getTransaction());
+        SelectImpl<E> select = new SelectImpl<E>(getEntityManager(), getTransaction());
         select.setQuery(query, nativeQuery);
         return select;
     }
 
 
     protected Select<E> select(String query) {
-        SelectImpl<E> select = new SelectImpl<E>(getTransaction());
+        SelectImpl<E> select = new SelectImpl<E>(getEntityManager(), getTransaction());
         select.setQuery(query);
         return select;
     }
 
 
     protected Select<E> select(CriteriaQuery<E> query) {
-        SelectImpl<E> select = new SelectImpl<E>(getTransaction());
+        SelectImpl<E> select = new SelectImpl<E>(getEntityManager(), getTransaction());
         select.setQuery(query);
         return select;
     }
 
 
     protected Select<E> select(TypedQuery<E> query) {
-        SelectImpl<E> select = new SelectImpl<E>(getTransaction());
+        SelectImpl<E> select = new SelectImpl<E>(getEntityManager(), getTransaction());
         select.setQuery(query);
         return select;
     }
 
 
     protected Update<E> update(String query, boolean nativeQuery) {
-        UpdateImpl<E> update = new UpdateImpl<E>(getTransaction());
+        UpdateImpl<E> update = new UpdateImpl<E>(getEntityManager(), getTransaction());
         update.setQuery(query, nativeQuery);
         return update;
     }
 
 
     protected Update<E> update(String query) {
-        UpdateImpl<E> update = new UpdateImpl<E>(getTransaction());
+        UpdateImpl<E> update = new UpdateImpl<E>(getEntityManager(), getTransaction());
         update.setQuery(query);
         return update;
     }
 
 
     protected Update<E> update(TypedQuery<E> query) {
-        UpdateImpl<E> update = new UpdateImpl<E>(getTransaction());
+        UpdateImpl<E> update = new UpdateImpl<E>(getEntityManager(), getTransaction());
         update.setQuery(query);
         return update;
     }
 
 
-    protected TypedQuery<E> getFindAllQuery(Context context) {
-        CriteriaBuilder builder = context.getEntityManager().getCriteriaBuilder();
+    protected TypedQuery<E> getFindAllQuery() {
+        CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
         CriteriaQuery<E> criteriaQuery = builder.createQuery(getEntityClass());
         Root<E> root = criteriaQuery.from(getEntityClass());
         criteriaQuery.select(root);
-        return context.getEntityManager().createQuery(criteriaQuery);
+        return getEntityManager().createQuery(criteriaQuery);
     }
 
 
     @Override
     public List<E> findAll() {
-        return getTransaction().exec((context) -> {
-            return getFindAllQuery(context).getResultList();
-        });
+        return getFindAllQuery().getResultList();
     }
 }

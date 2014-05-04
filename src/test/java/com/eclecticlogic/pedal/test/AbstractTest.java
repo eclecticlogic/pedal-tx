@@ -27,6 +27,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.reporters.Files;
 import org.testng.xml.XmlTest;
 
+import com.eclecticlogic.pedal.Transaction;
+
 /**
  * @author kabram.
  *
@@ -67,4 +69,8 @@ public abstract class AbstractTest {
         context.close();
     }
 
+
+    protected Transaction getTransaction() {
+        return getContext().getBean(Transaction.class);
+    }
 }

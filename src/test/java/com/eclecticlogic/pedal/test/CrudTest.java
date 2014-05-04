@@ -38,6 +38,7 @@ public class CrudTest extends AbstractTest {
 
     public void testCreation() {
         ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+
         Manufacturer m1 = new Manufacturer();
         m1.setName("test");
         m1.setLocation("USA");
@@ -145,13 +146,14 @@ public class CrudTest extends AbstractTest {
         ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
         assertEquals(dao.updateLocation("timbaktoo", "Mount Everest"), 0);
     }
-    
+
+
     public void testCreateAutoId() {
         EmployeeDAO dao = getContext().getBean(EmployeeDAO.class);
         Employee e = new Employee();
         e.setName("joe");
         dao.create(e);
-        
+
         e = new Employee();
         e.setName("jane");
         dao.create(e);

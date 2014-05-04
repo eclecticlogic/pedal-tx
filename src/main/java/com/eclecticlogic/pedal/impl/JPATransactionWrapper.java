@@ -16,79 +16,21 @@
  */
 package com.eclecticlogic.pedal.impl;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.DefaultTransactionStatus;
-
-import com.eclecticlogic.pedal.Context;
-import com.eclecticlogic.pedal.Transaction;
-import com.eclecticlogic.pedal.TransactionRunner;
-import com.eclecticlogic.pedal.dm.internal.TransactionManagerAccessor;
-import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @SuppressWarnings("serial")
-public class JPATransactionWrapper extends JpaTransactionManager implements TransactionManagerAccessor, Transaction {
-
-    private TransactionDelegate delegate;
-    private ProviderAccessSpi providerAccessSpi;
-
-
-    public JPATransactionWrapper() {
-        super();
-        delegate = new TransactionDelegate(this);
-    }
-
-
-    @Override
-    public ProviderAccessSpi getProviderAccessSpi() {
-        return providerAccessSpi;
-    }
-
-
-    public void setProviderAccessSpi(ProviderAccessSpi providerAccessSpi) {
-        this.providerAccessSpi = providerAccessSpi;
-    }
-
-
-    @Override
-    public void run(Consumer<Context> block) {
-        delegate.run(block);
-    }
-
-
-    @Override
-    public void run(Runnable block) {
-        delegate.run(block);
-    }
-
-
-    @Override
-    public <R> R exec(Supplier<R> block) {
-        return delegate.exec(block);
-    }
-
-
-    @Override
-    public <R> R exec(Function<Context, R> block) {
-        return delegate.exec(block);
-    }
-
-
-    @Override
-    public TransactionRunner with(Propagation propagation) {
-        return delegate.with(propagation);
-    }
-
+public class JPATransactionWrapper extends JpaTransactionManager {
 
     @Override
     protected void prepareSynchronization(DefaultTransactionStatus status, TransactionDefinition definition) {
         super.prepareSynchronization(status, definition);
-        delegate.prepareSynchronization(status, definition);
+        if (status.isNewTransaction()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapterData());
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapterTask());
+        }
     }
 
 }

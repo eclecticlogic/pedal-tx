@@ -251,7 +251,7 @@
 
 	<properties>
 		<version.hibernate>4.3.5.Final</version.hibernate>
-		<version.spring>4.0.3.RELEASE</version.spring>
+		<version.spring>4.0.4.RELEASE</version.spring>
 		<version.slf4j>1.7.7</version.slf4j>
 	</properties>
 </project>

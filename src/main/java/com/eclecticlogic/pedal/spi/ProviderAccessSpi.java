@@ -20,9 +20,9 @@ import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.eclecticlogic.pedal.Context;
-import com.eclecticlogic.pedal.ProviderAccess;
+import javax.persistence.EntityManager;
 
+import com.eclecticlogic.pedal.ProviderAccess;
 
 /**
  * Service provider implementation specific methods.
@@ -33,15 +33,16 @@ import com.eclecticlogic.pedal.ProviderAccess;
 public interface ProviderAccessSpi extends ProviderAccess {
 
     /**
-     * @param context The context of the transaction.
+     * @param entityMangager JPA entity manager reference.
      * @param work Execute the work passing in the underlying JDBC connection object.
      */
-    void run(Context context, Consumer<Connection> work);
+    public void run(EntityManager entityManager, Consumer<Connection> work);
+
 
     /**
-     * @param context The context of the transaction.
+     * @param entityManager JPA entity manager reference.
      * @param work Work to execute passing in the underlying JDBC connection object.
      * @return the output of the work.
      */
-    <R> R exec(Context context, Function<Connection, R> work);
+    public <R> R exec(EntityManager entityManager, Function<Connection, R> work);
 }

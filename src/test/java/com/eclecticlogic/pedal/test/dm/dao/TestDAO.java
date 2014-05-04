@@ -18,6 +18,9 @@ package com.eclecticlogic.pedal.test.dm.dao;
 
 import java.io.Serializable;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import com.eclecticlogic.pedal.dm.AbstractDAO;
 
 /**
@@ -26,5 +29,10 @@ import com.eclecticlogic.pedal.dm.AbstractDAO;
  */
 public abstract class TestDAO<E extends Serializable, P extends Serializable> extends AbstractDAO<E, P> {
 
-    
+    @Override
+    @PersistenceContext
+    public void setEntityManager(EntityManager entityManager) {
+        super.setEntityManager(entityManager);
+    }
+
 }

@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
@@ -30,7 +31,6 @@ import org.hibernate.jpa.HibernateEntityManagerFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.SingleTableEntityPersister;
 
-import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
 
 /**
@@ -75,15 +75,15 @@ public class HibernateProviderAccessSpiImpl implements ProviderAccessSpi {
 
 
     @Override
-    public void run(Context context, Consumer<Connection> work) {
-        Session session = context.getEntityManager().unwrap(Session.class);
+    public void run(EntityManager entityManager, Consumer<Connection> work) {
+        Session session = entityManager.unwrap(Session.class);
         session.doWork(connection -> work.accept(connection));
     }
 
 
     @Override
-    public <R> R exec(Context context, Function<Connection, R> work) {
-        Session session = context.getEntityManager().unwrap(Session.class);
+    public <R> R exec(EntityManager entityManager, Function<Connection, R> work) {
+        Session session = entityManager.unwrap(Session.class);
         return session.doReturningWork(connection -> work.apply(connection));
     }
 }

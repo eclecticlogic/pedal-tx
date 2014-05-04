@@ -87,10 +87,11 @@
 		<property name="entityManagerFactory" ref="emf" />
 	</bean>
 
-	<bean id="tx" class="com.eclecticlogic.pedal.impl.JPATransactionWrapper">
+	<bean id="ptf" class="com.eclecticlogic.pedal.impl.JPATransactionWrapper">
 		<property name="entityManagerFactory" ref="emf" />
-		<property name="providerAccessSpi" ref="hibernateProviderAccess" />
 	</bean>
 
-
+	<bean id="tx" class="com.eclecticlogic.pedal.impl.TransactionImpl">
+		<property name="platformTransactionManager" ref="ptf" />
+	</bean>
 </beans>

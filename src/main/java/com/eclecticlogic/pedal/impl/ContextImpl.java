@@ -16,33 +16,12 @@
  */
 package com.eclecticlogic.pedal.impl;
 
-import java.sql.Connection;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import javax.persistence.EntityManager;
 
 import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.DataContext;
-import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
 
 public class ContextImpl implements Context {
-
-    private EntityManager entityManager;
-    private ProviderAccessSpi providerAccessSpi;
-
-
-    public ContextImpl(EntityManager em, ProviderAccessSpi providerAccessSpi) {
-        this.entityManager = em;
-        this.providerAccessSpi = providerAccessSpi;
-    }
-
-
-    @Override
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
-
 
     @Override
     public void put(Object key, Object value) {
@@ -65,19 +44,6 @@ public class ContextImpl implements Context {
     @Override
     public void afterCommit(Consumer<DataContext> task) {
         TransactionSynchronizationAdapterTask.instance().addAfterCommit(task);
-    }
-
-
-    // Connection work methods
-    @Override
-    public void run(Consumer<Connection> work) {
-        providerAccessSpi.run(this, work);
-    }
-
-
-    @Override
-    public <R> R exec(Function<Connection, R> work) {
-        return providerAccessSpi.exec(this, work);
     }
 
 }

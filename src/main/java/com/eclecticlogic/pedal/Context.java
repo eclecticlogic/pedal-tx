@@ -16,32 +16,13 @@
  */
 package com.eclecticlogic.pedal;
 
-import java.sql.Connection;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import javax.persistence.EntityManager;
 
 public interface Context extends DataContext {
-
-    public EntityManager getEntityManager();
-
 
     public void beforeCommit(Consumer<DataContext> task);
 
 
     public void afterCommit(Consumer<DataContext> task);
 
-
-    /**
-     * @param work Do the work in the context of a underlying SQL connection.
-     */
-    public void run(Consumer<Connection> work);
-
-
-    /**
-     * @param work Do the work in the context of a underlying SQL connection.
-     * @return A value to return.
-     */
-    public <R> R exec(Function<Connection, R> work);
 }

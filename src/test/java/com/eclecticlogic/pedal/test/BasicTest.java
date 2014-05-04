@@ -48,7 +48,6 @@ public class BasicTest extends AbstractTest {
             m1.setName("beforeCommit");
             m1.setLocation("USA");
             dao.create(m1);
-            context.getEntityManager().flush();
 
             context.beforeCommit((DataContext dc) -> {
                 Thread t1 = new Thread(() -> {
@@ -130,12 +129,12 @@ public class BasicTest extends AbstractTest {
         ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
         assertEquals(dao.getPrimaryKeyProperty(), "name");
     }
-    
-    
+
+
     public void testTableName() {
         ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
         assertEquals(dao.getTableName(), "basic.manufacturer");
-        
+
         StudentDAO stdao = getContext().getBean(StudentDAO.class);
         assertEquals(stdao.getTableName(), "basic.graduate_student");
     }

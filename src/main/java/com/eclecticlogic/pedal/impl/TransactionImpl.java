@@ -16,55 +16,56 @@
  */
 package com.eclecticlogic.pedal.impl;
 
+import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.persistence.EntityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.DefaultTransactionStatus;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.eclecticlogic.pedal.Context;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.TransactionRunner;
-import com.eclecticlogic.pedal.dm.internal.TransactionManagerAccessor;
 
 /**
- * The delegate class has the functionality common to JPA and JTA (to implement the Transaction interface) pulled out
- * to avoid duplicating it.
- *  
  * @author kabram.
  *
  */
-public class TransactionDelegate implements Transaction {
+public class TransactionImpl implements Transaction {
 
-    private TransactionManagerAccessor accessor;
-    private ThreadLocal<TransactionDefinition> localTransactionDefinition = new ThreadLocal<TransactionDefinition>() {
+    private PlatformTransactionManager platformTransactionManager;
+    private ThreadLocal<Stack<TransactionDefinition>> localTransactionDefinition = new ThreadLocal<Stack<TransactionDefinition>>() {
 
         @Override
-        protected TransactionDefinition initialValue() {
-            DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-            transactionDefinition.setPropagationBehavior(Propagation.REQUIRED.value());
-            return transactionDefinition;
+        protected Stack<TransactionDefinition> initialValue() {
+            Stack<TransactionDefinition> stack = new Stack<>();
+            return stack;
         }
     };
 
-    private static Logger logger = LoggerFactory.getLogger(TransactionDelegate.class);
+    private static Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
 
-    public TransactionDelegate(TransactionManagerAccessor accessor) {
-        this.accessor = accessor;
+    protected PlatformTransactionManager getPlatformTransactionManager() {
+        return platformTransactionManager;
     }
 
 
+    public void setPlatformTransactionManager(PlatformTransactionManager platformTransactionManager) {
+        this.platformTransactionManager = platformTransactionManager;
+    }
+
+
+    /**
+     * @param propagation
+     * @return
+     */
     @Override
     public TransactionRunner with(Propagation propagation) {
         if (propagation == Propagation.NOT_SUPPORTED) {
@@ -72,7 +73,7 @@ public class TransactionDelegate implements Transaction {
         } else {
             DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
             transactionDefinition.setPropagationBehavior(propagation.value());
-            localTransactionDefinition.set(transactionDefinition);
+            localTransactionDefinition.get().push(transactionDefinition);
             return this;
         }
     }
@@ -111,30 +112,27 @@ public class TransactionDelegate implements Transaction {
     public <R> R _exec(Function<Context, R> runner) {
         TransactionStatus status = null;
         try {
-            status = accessor.getTransaction(localTransactionDefinition.get());
+            status = getPlatformTransactionManager().getTransaction(getTransactionDefinition());
             logger.trace("start: new = {}", status.isNewTransaction() ? "yes" : "no");
 
-            EntityManager em = EntityManagerFactoryUtils.getTransactionalEntityManager(accessor
-                    .getEntityManagerFactory());
-
-            Context context = new ContextImpl(em, accessor.getProviderAccessSpi());
+            Context context = new ContextImpl();
 
             R retval = runner.apply(context);
 
             if (status.isRollbackOnly()) {
-                accessor.rollback(status);
+                getPlatformTransactionManager().rollback(status);
                 logger.trace("rollback");
             } else {
-                accessor.commit(status);
+                getPlatformTransactionManager().commit(status);
                 logger.trace("commit");
             }
 
             return retval;
         } catch (RuntimeException e) {
             if (status != null && status.isCompleted() == false) {
-                accessor.rollback(status);
+                getPlatformTransactionManager().rollback(status);
                 logger.trace("rollback");
-            } else {
+            } else if (!status.isRollbackOnly()) {
                 logger.trace("Transaction already complete.");
             }
             throw e;
@@ -142,10 +140,13 @@ public class TransactionDelegate implements Transaction {
     }
 
 
-    public void prepareSynchronization(DefaultTransactionStatus status, TransactionDefinition definition) {
-        if (status.isNewTransaction()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapterData());
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapterTask());
+    private TransactionDefinition getTransactionDefinition() {
+        if (localTransactionDefinition.get().isEmpty()) {
+            DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
+            transactionDefinition.setPropagationBehavior(Propagation.REQUIRED.value());
+            return transactionDefinition;
+        } else {
+            return localTransactionDefinition.get().pop();
         }
     }
 }

@@ -18,6 +18,7 @@ package com.eclecticlogic.pedal.dm.internal;
 
 import java.io.Serializable;
 
+import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 
@@ -26,8 +27,8 @@ import com.eclecticlogic.pedal.dm.Update;
 
 public class UpdateImpl<T extends Serializable> extends AbstractDDL<T> implements Update<T> {
 
-    public UpdateImpl(Transaction transaction) {
-        super(transaction);
+    public UpdateImpl(EntityManager entityManager, Transaction transaction) {
+        super(entityManager, transaction);
     }
 
 
@@ -47,8 +48,8 @@ public class UpdateImpl<T extends Serializable> extends AbstractDDL<T> implement
 
     @Override
     public int update() {
-        return getTransaction().exec((context) -> {
-            Query query = getQuery(context);
+        return getTransaction().exec(() -> {
+            Query query = getQuery();
             return query.executeUpdate();
         });
     }

@@ -21,7 +21,6 @@
 	<bean id="abstractDAO" abstract="true" class="com.eclecticlogic.pedal.test.dm.dao.TestDAO">
 		<property name="transaction" ref="tx" />
 		<property name="providerAccess" ref="hibernateProviderAccess" />
-		<property name="entityManagerFactory" ref="emf" />
 	</bean>
 
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO" />

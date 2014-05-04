@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.persistence.EntityManager;
+
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 
-import com.eclecticlogic.pedal.Context;
-import com.eclecticlogic.pedal.ProviderAccess;
 import com.eclecticlogic.pedal.provider.ConnectionAccessor;
+import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
@@ -37,7 +38,7 @@ import com.google.common.base.Throwables;
 public class CopyCommand {
 
     private ConnectionAccessor connectionAccessor;
-    private ProviderAccess providerAccess;
+    private ProviderAccessSpi providerAccessSpi;
 
 
     public void setConnectionAccessor(ConnectionAccessor connectionAccessor) {
@@ -45,8 +46,8 @@ public class CopyCommand {
     }
 
 
-    public void setProviderAccess(ProviderAccess providerAccess) {
-        this.providerAccess = providerAccess;
+    public void setProviderAccessSpi(ProviderAccessSpi providerAccessSpi) {
+        this.providerAccessSpi = providerAccessSpi;
     }
 
 
@@ -55,19 +56,21 @@ public class CopyCommand {
      * @param lists Entities to be inserted using the Postgres COPY command.
      */
     @SuppressWarnings("unchecked")
-    public <E extends Serializable> void insert(Context context, CopyList<E>... lists) {
+    public <E extends Serializable> void insert(EntityManager entityManager, CopyList<E>... lists) {
         if (lists != null) {
-            context.run(connection -> {
-                try {
-                    CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
-                            .getRawConnection(connection));
-                    for (CopyList<E> copyList : lists) {
-                        _insert(copyManager, copyList);
-                    }
-                } catch (Exception e) {
-                    throw Throwables.propagate(e);
-                }
-            });
+            providerAccessSpi.run(
+                    entityManager,
+                    connection -> {
+                        try {
+                            CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
+                                    .getRawConnection(connection));
+                            for (CopyList<E> copyList : lists) {
+                                _insert(copyManager, copyList);
+                            }
+                        } catch (Exception e) {
+                            throw Throwables.propagate(e);
+                        }
+                    });
 
         }
     }
@@ -84,9 +87,9 @@ public class CopyCommand {
 
     private <E extends Serializable> String getEntityName(CopyList<E> copyList) {
         if (Strings.isNullOrEmpty(copyList.getAlternateTableName())) {
-            return providerAccess.getTableName(copyList.get(0).getClass());
+            return providerAccessSpi.getTableName(copyList.get(0).getClass());
         } else {
-            String schemaName = providerAccess.getSchemaName();
+            String schemaName = providerAccessSpi.getSchemaName();
             if (Strings.isNullOrEmpty(schemaName)) {
                 return copyList.getAlternateTableName();
             } else {
