@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<description>Pedal is an idiomatic JPA and Spring based DAO framework.</description>
@@ -20,8 +21,7 @@
 		<url>git@github.com:eclecticlogic/pedal.gt</url>
 		<developerConnection>scm:git:git@github.com:eclecticlogic/pedal.git</developerConnection>
 		<connection>scm:git:git@github.com:eclecticlogic/pedal.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
+	</scm>
 
 	<developers>
 		<developer>
