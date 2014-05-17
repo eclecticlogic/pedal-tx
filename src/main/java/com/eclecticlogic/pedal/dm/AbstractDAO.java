@@ -47,6 +47,10 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
+    /**
+     * This method can be overridden as-is with an added @PersistenceContext annotation to have Spring supply the entity manager. 
+     * @param entityManager
+     */
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
@@ -72,6 +76,9 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
+    /**
+     * @return The name of the entity's database table. This returns the overridden name if orm.xml modifies it. 
+     */
     protected String getTableName() {
         return getProviderAccess().getTableName(getEntityClass());
     }
