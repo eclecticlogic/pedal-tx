@@ -124,7 +124,7 @@ The update(query) api is similar to the select and can be used to execute update
 	}
 ```
 
-# Other Features
+# Transaction Management
 
 ## Transactions
 
@@ -184,4 +184,7 @@ Transaction attached jobs allow you to fire code either just before and just aft
        });
    }
 ```
-   
+
+# Provider Features
+
+Pedal currently implements support for Hibernate and allows access to the ProviderAccess interface from within the DAOs. This interface provides access to the current schema name and the table name (including overridden names in orm.xml) for entities.    
