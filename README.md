@@ -8,7 +8,7 @@ A Java 8 based idiomatic JPA DAO framework. Let the examples say the rest.
 Download the Pedal jar from Maven central:
 
 ```
-	<groupId>pedal</groupId>
+	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
 	<version>1.0.0</version>
 ```

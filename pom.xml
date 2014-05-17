@@ -9,7 +9,7 @@
 		<version>8</version>
 	</parent>
 
-	<groupId>pedal</groupId>
+	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
