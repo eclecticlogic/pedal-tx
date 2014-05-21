@@ -10,6 +10,7 @@
 		<mapping class="com.eclecticlogic.pedal.test.dm.Employee" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Primus" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Secundus" />
+		<mapping class="com.eclecticlogic.pedal.test.dm.Master" />
 	</session-factory>
 
 </hibernate-configuration>

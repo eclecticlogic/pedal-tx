@@ -17,27 +17,30 @@
 package com.eclecticlogic.pedal.test;
 
 import static org.testng.Assert.assertEquals;
-
-
+import static org.testng.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
-
-
+import java.util.Optional;
 
 import org.testng.annotations.Test;
 
-
-
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.test.dm.Embedee;
 import com.eclecticlogic.pedal.test.dm.Employee;
+import com.eclecticlogic.pedal.test.dm.Grade;
 import com.eclecticlogic.pedal.test.dm.Manufacturer;
+import com.eclecticlogic.pedal.test.dm.Master;
+import com.eclecticlogic.pedal.test.dm.Name;
 import com.eclecticlogic.pedal.test.dm.Primus;
 import com.eclecticlogic.pedal.test.dm.Secundus;
+import com.eclecticlogic.pedal.test.dm.Student;
 import com.eclecticlogic.pedal.test.dm.dao.EmployeeDAO;
 import com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO;
+import com.eclecticlogic.pedal.test.dm.dao.MasterDAO;
 import com.eclecticlogic.pedal.test.dm.dao.PrimusDAO;
 import com.eclecticlogic.pedal.test.dm.dao.SecundusDAO;
+import com.eclecticlogic.pedal.test.dm.dao.StudentDAO;
 import com.google.common.collect.Lists;
 
 /**
@@ -169,22 +172,49 @@ public class CrudTest extends AbstractTest {
         e.setName("jane");
         dao.create(e);
     }
-    
-    
+
+
     public void testOneToOne() {
         Transaction tx = getContext().getBean(Transaction.class);
         tx.run(() -> {
             PrimusDAO pdao = getContext().getBean(PrimusDAO.class);
             SecundusDAO sdao = getContext().getBean(SecundusDAO.class);
-            
+
             Primus p = new Primus();
             p.setName("Hello");
             Secundus s = new Secundus();
             s.setName("Second");
             s.setPrimus(p);
-            
+
             pdao.create(p);
             sdao.create(s);
         });
+    }
+
+
+    public void testWithConverter() {
+        StudentDAO sdao = getContext().getBean(StudentDAO.class);
+        Student student = new Student();
+        student.setGrade(Grade.A);
+        student.setName("Joe");
+        student.setZone("AZ");
+        sdao.create(student);
+    }
+    
+    
+    public void testEmbedded() {
+        MasterDAO mdao = getContext().getBean(MasterDAO.class);
+        
+        Embedee e = new Embedee();
+        e.setId(5);
+        e.setName(Name.JOE);
+        
+        Master m = new Master();
+        m.setId(e);
+        m.setDescription("Some text here");
+        mdao.create(m);
+        Optional<Master> m2 = mdao.findById(e);
+        assertTrue(m2.isPresent());
+        assertEquals(m2.get().getId().getName(), Name.JOE);
     }
 }

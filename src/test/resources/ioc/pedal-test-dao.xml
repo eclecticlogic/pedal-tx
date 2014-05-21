@@ -29,4 +29,5 @@
 	
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.PrimusDAO" />
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.SecundusDAO" />
+	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.MasterDAO" />
 </beans>

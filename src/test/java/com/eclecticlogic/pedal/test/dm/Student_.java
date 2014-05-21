@@ -10,6 +10,8 @@ public abstract class Student_ {
 
 	public static volatile SingularAttribute<Student, String> id;
 	public static volatile SingularAttribute<Student, String> name;
+	public static volatile SingularAttribute<Student, Grade> grade;
+	public static volatile SingularAttribute<Student, String> zone;
 
 }
 

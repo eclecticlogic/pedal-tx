@@ -17,6 +17,7 @@
 package com.eclecticlogic.pedal.test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -24,10 +25,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.reporters.Files;
 import org.testng.xml.XmlTest;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.google.common.collect.Lists;
 
 /**
  * @author kabram.
@@ -52,12 +53,12 @@ public abstract class AbstractTest {
         // Setup the create schema file.
         {
             Path path = Paths.get("src", "test", "scripts", "create-schema-" + schemaName + ".sql");
-            Files.writeFile("create schema " + schemaName + ";", path.toFile());
+            Files.write(path, Lists.newArrayList("create schema " + schemaName + ";"));
         }
 
         {
             Path path = Paths.get("src", "test", "scripts", "drop-schema-" + schemaName + ".sql");
-            Files.writeFile("drop schema " + schemaName + " cascade;", path.toFile());
+            Files.write(path, Lists.newArrayList("drop schema " + schemaName + " cascade;"));
         }
         ((GenericXmlApplicationContext) context).load("classpath:ioc/pedal-test-main.xml");
         context.refresh();

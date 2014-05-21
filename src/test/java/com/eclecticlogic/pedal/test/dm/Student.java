@@ -19,6 +19,7 @@ package com.eclecticlogic.pedal.test.dm;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -37,6 +38,8 @@ public class Student implements Serializable {
 
     private String id;
     private String name;
+    private Grade grade;
+    private String zone;
 
 
     @Id
@@ -61,6 +64,27 @@ public class Student implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    @Convert(converter = GradeConverter.class)
+    public Grade getGrade() {
+        return grade;
+    }
+
+
+    public void setGrade(Grade grade) {
+        this.grade = grade;
+    }
+
+
+    public String getZone() {
+        return zone;
+    }
+
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
 }
