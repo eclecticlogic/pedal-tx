@@ -42,6 +42,9 @@ public enum Grade {
 
     static {
         for (Grade e : values()) {
+            if (enumByCode.get(e.getCode()) != null) {
+                throw new RuntimeException("Duplicate code found: " + e);
+            }
             enumByCode.put(e.getCode(), e);
         }
     }
