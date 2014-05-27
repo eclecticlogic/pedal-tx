@@ -23,6 +23,7 @@
 		<property name="password" value="postgres" />
 
 		<!-- Connection pool configuration -->
+		<property name="poolName" value="pool-${test.schemaName}" />
 		<property name="partitionCount" value="3" />
 		<property name="minConnectionsPerPartition" value="5" />
 		<property name="maxConnectionsPerPartition" value="5" />
@@ -66,6 +67,7 @@
 				<prop key="javax.persistence.schema-generation.database.action">drop-and-create</prop>
 				<prop key="javax.persistence.schema-generation.create-source">script-then-metadata</prop>
 				<prop key="javax.persistence.schema-generation.drop-source">script</prop>
+				
 				<prop key="javax.persistence.schema-generation.create-script-source">src/test/scripts/${test.createScript}</prop>
 				<prop key="javax.persistence.schema-generation.drop-script-source">src/test/scripts/${test.dropScript}</prop>
 				<prop key="javax.persistence.sql-load-script-source">initialization.sql</prop>

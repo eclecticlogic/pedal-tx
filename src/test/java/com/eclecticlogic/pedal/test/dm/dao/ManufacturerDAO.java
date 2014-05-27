@@ -18,17 +18,24 @@ package com.eclecticlogic.pedal.test.dm.dao;
 
 import java.util.List;
 
+import com.eclecticlogic.pedal.dm.TestableDAO;
 import com.eclecticlogic.pedal.test.dm.Manufacturer;
 
 /**
  * @author kabram.
  *
  */
-public class ManufacturerDAO extends TestDAO<Manufacturer, String> {
+public class ManufacturerDAO extends TestDAO<Manufacturer, String> implements TestableDAO<String> {
 
     @Override
     public Class<Manufacturer> getEntityClass() {
         return Manufacturer.class;
+    }
+
+
+    @Override
+    public String getPrototypicalPrimaryKey() {
+        return "test";
     }
 
 

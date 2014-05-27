@@ -36,4 +36,10 @@ public interface DAORegistry {
      * @return DAO for the entity.
      */
     public <E extends Serializable, P extends Serializable> DAO<E, P> get(E entity);
+    
+    
+    /**
+     * Tests various operations on the DAOs (DAOs should implement the TestableDAO interface).
+     */
+    public <E extends Serializable, P extends Serializable> void testDAOs();
 }

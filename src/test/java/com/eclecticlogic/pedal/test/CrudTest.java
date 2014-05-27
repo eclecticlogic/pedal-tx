@@ -26,6 +26,7 @@ import java.util.Optional;
 import org.testng.annotations.Test;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.test.dm.Embedee;
 import com.eclecticlogic.pedal.test.dm.Employee;
 import com.eclecticlogic.pedal.test.dm.Grade;
@@ -216,5 +217,12 @@ public class CrudTest extends AbstractTest {
         Optional<Master> m2 = mdao.findById(e);
         assertTrue(m2.isPresent());
         assertEquals(m2.get().getId().getName(), Name.JOE);
+    }
+    
+    
+    public void testViaDAORegistry() {
+        DAORegistry registry = getContext().getBean(DAORegistry.class);
+        
+        registry.testDAOs();
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.DAO;
 import com.eclecticlogic.pedal.dm.DAORegistry;
+import com.eclecticlogic.pedal.dm.TestableDAO;
 
 public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
 
@@ -83,6 +84,31 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
     @SuppressWarnings("unchecked")
     public <E extends Serializable, P extends Serializable> DAO<E, P> get(E entity) {
         return (DAO<E, P>) daosByEntityClass.get(getEntityClass(entity));
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E extends Serializable, P extends Serializable> void testDAOs() {
+        for (DAO<? extends Serializable, ? extends Serializable> udao : daosByEntityClass.values()) {
+            DAO<E, P> dao = getGenericizedDAO(udao);
+            if (dao instanceof TestableDAO) {
+                P pk = ((TestableDAO<P>) dao).getPrototypicalPrimaryKey();
+                dao.findById(pk);
+            }
+        }
+    }
+
+
+    /**
+     * This is to work around java generics coercion.
+     * @param dao
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private <E extends Serializable, P extends Serializable> DAO<E, P> getGenericizedDAO(
+            DAO<? extends Serializable, ? extends Serializable> dao) {
+        return (DAO<E, P>) dao;
     }
 
 

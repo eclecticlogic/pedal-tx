@@ -14,25 +14,19 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.test.dm.dao;
+package com.eclecticlogic.pedal.dm;
 
-import com.eclecticlogic.pedal.dm.TestableDAO;
-import com.eclecticlogic.pedal.test.dm.Employee;
+import java.io.Serializable;
+
 
 /**
  * @author kabram.
- *
+ * @param <P> Primary key of the entity that this DAO manages.
  */
-public class EmployeeDAO extends TestDAO<Employee, Integer> implements TestableDAO<Integer> {
+public interface TestableDAO<P extends Serializable> {
 
-    @Override
-    public Class<Employee> getEntityClass() {
-        return Employee.class;
-    }
-
-
-    @Override
-    public Integer getPrototypicalPrimaryKey() {
-        return 1;
-    }
+    /**
+     * @return A sample primary key that is used to execute a find by pk query for basic testing.
+     */
+    public P getPrototypicalPrimaryKey();
 }
