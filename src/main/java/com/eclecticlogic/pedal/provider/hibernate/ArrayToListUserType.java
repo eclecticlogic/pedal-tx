@@ -37,7 +37,7 @@ import org.hibernate.engine.spi.SessionImplementor;
  * @author kabram.
  *
  */
-public abstract class ArrayUserType<T> extends AbstractMutableUserType {
+public abstract class ArrayToListUserType<T> extends AbstractMutableUserType {
 
     protected abstract String getDialectPrimitiveName();
 

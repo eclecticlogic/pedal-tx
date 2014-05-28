@@ -22,6 +22,8 @@ import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -36,6 +38,7 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
     private EntityManagerFactory entityManagerFactory;
     private Map<Class<?>, DAO<? extends Serializable, ? extends Serializable>> daosByEntityClass = new HashMap<>();
 
+    private static Logger logger = LoggerFactory.getLogger(DAORegistryImpl.class);
 
     protected Transaction getTransaction() {
         return transaction;
@@ -93,7 +96,9 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
         for (DAO<? extends Serializable, ? extends Serializable> udao : daosByEntityClass.values()) {
             DAO<E, P> dao = getGenericizedDAO(udao);
             if (dao instanceof TestableDAO) {
+                logger.debug("Testing DAO " + dao.getClass().getName());
                 P pk = ((TestableDAO<P>) dao).getPrototypicalPrimaryKey();
+                logger.trace("Testing find method with pk " + pk);
                 dao.findById(pk);
             }
         }

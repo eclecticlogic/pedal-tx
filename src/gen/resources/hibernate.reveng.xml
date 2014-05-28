@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering SYSTEM "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd">
+<hibernate-reverse-engineering>
+
+    <table-filter match-name=".*" />
+	
+	<table name="exotic_types" class="com.eclecticlogic.pedal.forward.dm.ExoticTypes" />
+	
+</hibernate-reverse-engineering>

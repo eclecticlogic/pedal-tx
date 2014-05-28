@@ -18,7 +18,7 @@ package com.eclecticlogic.pedal.provider.hibernate.dialect;
 
 import java.math.BigDecimal;
 
-import com.eclecticlogic.pedal.provider.hibernate.ArrayUserType;
+import com.eclecticlogic.pedal.provider.hibernate.ArrayToListUserType;
 
 /**
  * Adapter from https://forum.hibernate.org/viewtopic.php?t=946973 and
@@ -27,9 +27,9 @@ import com.eclecticlogic.pedal.provider.hibernate.ArrayUserType;
  * @author kabram.
  *
  */
-public abstract class PostgresqlArrayUserType<T> extends ArrayUserType<T> {
+public abstract class PostgresqlArrayToListUserType<T> extends ArrayToListUserType<T> {
 
-    public static class BOOLEAN extends PostgresqlArrayUserType<Boolean> {
+    public static class BOOLEAN extends PostgresqlArrayToListUserType<Boolean> {
 
         @Override
         protected String getDialectPrimitiveName() {
@@ -37,7 +37,7 @@ public abstract class PostgresqlArrayUserType<T> extends ArrayUserType<T> {
         }
     }
     
-    public static class INTEGER extends PostgresqlArrayUserType<Integer> {
+    public static class INTEGER extends PostgresqlArrayToListUserType<Integer> {
 
         @Override
         protected String getDialectPrimitiveName() {
@@ -45,7 +45,7 @@ public abstract class PostgresqlArrayUserType<T> extends ArrayUserType<T> {
         }
     }
     
-    public static class LONG extends PostgresqlArrayUserType<Long> {
+    public static class LONG extends PostgresqlArrayToListUserType<Long> {
 
         @Override
         protected String getDialectPrimitiveName() {
@@ -53,7 +53,7 @@ public abstract class PostgresqlArrayUserType<T> extends ArrayUserType<T> {
         }
     }
     
-    public static class STRING extends PostgresqlArrayUserType<Long> {
+    public static class STRING extends PostgresqlArrayToListUserType<Long> {
 
         @Override
         protected String getDialectPrimitiveName() {
@@ -61,7 +61,7 @@ public abstract class PostgresqlArrayUserType<T> extends ArrayUserType<T> {
         }
     }
     
-    public static class BIGDECIMAL extends PostgresqlArrayUserType<BigDecimal> {
+    public static class BIGDECIMAL extends PostgresqlArrayToListUserType<BigDecimal> {
 
         @Override
         protected String getDialectPrimitiveName() {

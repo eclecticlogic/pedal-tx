@@ -18,4 +18,10 @@
 			<class name="com.eclecticlogic.pedal.test.CrudTest" />
 		</classes>
 	</test>
+	
+	<test name="forward">
+		<classes>
+			<class name="com.eclecticlogic.pedal.forward.TestExoticTypes" />
+		</classes>
+	</test>
 </suite>
