@@ -10,7 +10,7 @@ Download the Pedal jar from Maven central:
 ```
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 ```
 
 Minimum dependencies that you need to provide in your application:
@@ -187,4 +187,12 @@ Transaction attached jobs allow you to fire code either just before and just aft
 
 # Provider Features
 
-Pedal currently implements support for Hibernate and allows access to the ProviderAccess interface from within the DAOs. This interface provides access to the current schema name and the table name (including overridden names in orm.xml) for entities.    
+Pedal currently implements support for Hibernate and allows access to the ProviderAccess interface from within the DAOs. This interface provides access to the current schema name and the table name (including overridden names in orm.xml) for entities.
+
+# Release notes
+
+## 1.2.0
+
+- Added support for PostgreSQL bit strings (PostgresqlBitStringUserType).
+- Added tests of array (mapping to list and set) and bit string types.
+- Added typical database to Java/JPA hibernate reverse-engineering setup to pom.
