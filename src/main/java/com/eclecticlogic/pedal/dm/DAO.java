@@ -69,6 +69,19 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
     public List<E> delete(E... entities);
 
 
+    /**
+     * @param entity Entity to lock
+     * @param lockMode Locking mode
+     * @return Locked entity refreshed to reflect state after locking.
+     */
     public E lock(E entity, LockModeType lockMode);
+    
+    
+    /**
+     * @param id Primary key of row to be locked.
+     * @param lockMode Locking mode
+     * @return Locked entity.
+     */
+    public E lockById(P id, LockModeType lockMode);
 
 }

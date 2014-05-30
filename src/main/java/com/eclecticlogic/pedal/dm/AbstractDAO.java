@@ -196,11 +196,17 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     @Override
     public E lock(final E entity, final LockModeType lockMode) {
         return getTransaction().exec(() -> {
-            getEntityManager().lock(entity, lockMode);
-            getEntityManager().detach(entity);
-            E merged = getEntityManager().merge(entity);
+            getEntityManager().refresh(entity, lockMode);
             getEntityManager().flush();
-            return merged;
+            return entity;
+        });
+    }
+
+
+    @Override
+    public E lockById(P id, LockModeType lockMode) {
+        return getTransaction().exec(() -> {
+            return getEntityManager().find(getEntityClass(), id, lockMode);
         });
     }
 
