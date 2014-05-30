@@ -191,6 +191,10 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 
 # Release notes
 
+## 1.2.1
+
+- Modified lock api to work with entity or id. 
+
 ## 1.2.0
 
 - Added support for PostgreSQL bit strings (PostgresqlBitStringUserType).
