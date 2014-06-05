@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.test.dm.dao.TestDAO;
+import com.mysema.query.jpa.impl.JPAQuery;
 
 /**
  * @author kabram.
@@ -42,4 +43,12 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
         return ExoticTypes.class;
     }
 
+
+    public ExoticTypes testWithQueryDSL() {
+        JPAQuery query = new JPAQuery(getEntityManager());
+        QExoticTypes et = QExoticTypes.exoticTypes;
+        return query.from(et) //
+                .where(et.status.eq(Status.ACTIVE)) //
+                .uniqueResult(et);
+    }
 }
