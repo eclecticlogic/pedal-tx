@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -24,6 +25,7 @@ public class ExoticTypes implements java.io.Serializable {
     private List<Boolean> countries;
     private Set<String> authorizations;
     private List<Long> scores;
+    private Status status;
 
 
     @Id
@@ -71,6 +73,18 @@ public class ExoticTypes implements java.io.Serializable {
 
     public void setScores(List<Long> scores) {
         this.scores = scores;
+    }
+
+
+    @Column(name = "status", nullable = false, length = 2)
+    @Convert(converter = StatusConverter.class)
+    public Status getStatus() {
+        return status;
+    }
+
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
 }

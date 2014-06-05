@@ -31,6 +31,7 @@ import org.testng.xml.XmlTest;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypes;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypesDAO;
+import com.eclecticlogic.pedal.forward.dm.Status;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -74,6 +75,7 @@ public class TestExoticTypes {
         et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(1L, 2L, 3L));
+        et.setStatus(Status.ACTIVE);
         
         dao.create(et);
     }
@@ -87,11 +89,13 @@ public class TestExoticTypes {
         et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(1L, 2L, 3L));
+        et.setStatus(Status.INACTIVE);
         
         dao.create(et);
         
         ExoticTypes et1 = dao.findById("test").get();
         assertEquals(et1.getLogin(), "test");
         assertTrue(et1.getCountries().get(2));
+        assertTrue(et1.getStatus() == Status.INACTIVE);
     }
 }
