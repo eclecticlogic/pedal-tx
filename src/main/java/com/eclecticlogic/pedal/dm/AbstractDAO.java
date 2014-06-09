@@ -63,7 +63,12 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
 
     private void setupUpdateDateTimeFlags() {
-        Attribute<? super E, ?> attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getUpdatedDateProperty());
+        Attribute<? super E, ?> attr = null;
+        try {
+            attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getUpdatedDateProperty());
+        } catch (IllegalArgumentException e) {
+            // noop. This is thrown if the attribute doesn't exist.
+        }
         if (attr != null) {
             Temporal temporalAnnotation = null;
             Member member = attr.getJavaMember();
@@ -81,8 +86,12 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
 
     private void setupInsertDateTimeFlags() {
-        Attribute<? super E, ?> attr = getEntityType()
-                .getAttribute(((DateTimeAwareDAO) this).getInsertedDateProperty());
+        Attribute<? super E, ?> attr = null;
+        try {
+            attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getInsertedDateProperty());
+        } catch (IllegalArgumentException e) {
+            // noop. This is thrown if the attribute doesn't exist.
+        }
         if (attr != null) {
             Temporal temporalAnnotation = null;
             Member member = attr.getJavaMember();

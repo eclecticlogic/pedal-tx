@@ -27,6 +27,11 @@ import java.util.Date;
  * This is called out as a separate interface so that the implementer can provide their own way of determining 
  * current date/time (such a strategy helps in testing).
  * 
+ * It is recommended that an application-level base DAO that derives from AbstractDAO be the one that implements this
+ * interface. When implementing this interface, the base DAO should call AbstractDAO.init() via dependency-injection
+ * (e.g. @PostContruct annotation on an override of init() that simply calls super.init) or other means 
+ * (e.g. init property of Spring bean definition).
+ * 
  * @author kabram.
  *
  */
