@@ -47,6 +47,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     private Transaction transaction;
     private EntityManager entityManager;
+    private DateTimeProvider dateTimeProvider;
     private ProviderAccess providerAccess;
     private boolean insertDateTimeAware, insertDateAware, updateDateTimeAware, updateDateAware, updateDTRequired;
 
@@ -55,17 +56,22 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
      * Subclasses should override this and call this via a @PostContruct annotation or other means. 
      */
     protected void init() {
-        if (this instanceof DateTimeAwareDAO) {
+        if (dateTimeProvider != null) {
             setupInsertDateTimeFlags();
             setupUpdateDateTimeFlags();
         }
     }
 
 
+    protected void setDateTimeProvider(DateTimeProvider dateTimeProvider) {
+        this.dateTimeProvider = dateTimeProvider;
+    }
+
+
     private void setupUpdateDateTimeFlags() {
         Attribute<? super E, ?> attr = null;
         try {
-            attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getUpdatedDateProperty());
+            attr = getEntityType().getAttribute(dateTimeProvider.getUpdatedDateProperty());
         } catch (IllegalArgumentException e) {
             // noop. This is thrown if the attribute doesn't exist.
         }
@@ -89,7 +95,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     private void setupInsertDateTimeFlags() {
         Attribute<? super E, ?> attr = null;
         try {
-            attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getInsertedDateProperty());
+            attr = getEntityType().getAttribute(dateTimeProvider.getInsertedDateProperty());
         } catch (IllegalArgumentException e) {
             // noop. This is thrown if the attribute doesn't exist.
         }
@@ -164,12 +170,12 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
                 () -> {
                     if (insertDateTimeAware) {
                         Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                                ((DateTimeAwareDAO) this).getInsertedDateProperty());
-                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
+                                dateTimeProvider.getInsertedDateProperty());
+                        MetamodelUtil.set(attr, entity, dateTimeProvider.fromCurrentDateTime());
                     } else if (insertDateAware) {
                         Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                                ((DateTimeAwareDAO) this).getInsertedDateProperty());
-                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
+                                dateTimeProvider.getInsertedDateProperty());
+                        MetamodelUtil.set(attr, entity, dateTimeProvider.fromCurrentDate());
                     }
                     if (updateDTRequired) {
                         setUpdateDateTimeIfRequired(entity);
@@ -232,12 +238,12 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     private void setUpdateDateTimeIfRequired(final E entity) {
         if (updateDateTimeAware) {
             Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                    ((DateTimeAwareDAO) this).getUpdatedDateProperty());
-            MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
+                    dateTimeProvider.getUpdatedDateProperty());
+            MetamodelUtil.set(attr, entity, dateTimeProvider.fromCurrentDateTime());
         } else if (updateDateAware) {
             Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                    ((DateTimeAwareDAO) this).getUpdatedDateProperty());
-            MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
+                    dateTimeProvider.getUpdatedDateProperty());
+            MetamodelUtil.set(attr, entity, dateTimeProvider.fromCurrentDate());
         }
     }
 

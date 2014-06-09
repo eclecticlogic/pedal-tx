@@ -10,7 +10,7 @@ Download the Pedal jar from Maven central:
 ```
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.3.2</version>
+	<version>1.3.3</version>
 ```
 
 Minimum dependencies that you need to provide in your application:

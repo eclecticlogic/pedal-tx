@@ -22,25 +22,25 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
- * DAOs that implement this interface are able to automatically set inserted and updated timestamps on the entity
+ * DAOs that have this provider are able to automatically set inserted and updated timestamps on the entity
  * in a create() or save() call.
- * This is called out as a separate interface so that the implementer can provide their own way of determining 
+ * This is called out as a provider interface so that the implementer can provide their own way of determining 
  * current date/time (such a strategy helps in testing).
  * 
- * It is recommended that an application-level base DAO that derives from AbstractDAO be the one that implements this
- * interface. When implementing this interface, the base DAO should call AbstractDAO.init() via dependency-injection
- * (e.g. @PostContruct annotation on an override of init() that simply calls super.init) or other means 
- * (e.g. init property of Spring bean definition).
+ * It is recommended that an application-level base DAO that derives from AbstractDAO be the one that sets the provider 
+ * to a specific implementation (a derivative of this class per required customizations). When this provider is set, 
+ * the application's base DAO should call AbstractDAO.init() via dependency-injection (e.g. @PostContruct annotation 
+ * on an override of init() that simply calls super.init) or other means (e.g. init property of Spring bean definition).
  * 
  * @author kabram.
  *
  */
-public interface DateTimeAwareDAO {
+public class DateTimeProvider {
 
     /**
      * @return Date and time.
      */
-    default ZonedDateTime getCurrentDateTime() {
+    public ZonedDateTime getCurrentDateTime() {
         return ZonedDateTime.now();
     }
 
@@ -48,15 +48,15 @@ public interface DateTimeAwareDAO {
     /**
      * @return Local date (no time component).
      */
-    default LocalDate getCurrentDate() {
-        return LocalDate.now(); 
+    public LocalDate getCurrentDate() {
+        return LocalDate.now();
     }
 
 
     /**
      * @return The name of the attribute (java-bean) for storing date/time of insertion. 
      */
-    default String getInsertedDateProperty() {
+    public String getInsertedDateProperty() {
         return "insertedOn";
     }
 
@@ -64,22 +64,22 @@ public interface DateTimeAwareDAO {
     /**
      * @return THe name of the attribute (java-bean) for storing date/time of update.
      */
-    default String getUpdatedDateProperty() {
+    public String getUpdatedDateProperty() {
         return "updatedOn";
     }
 
 
-    default ZoneId getZone() {
+    public ZoneId getZone() {
         return ZoneId.systemDefault();
     }
 
 
-    default Date fromCurrentDateTime() {
+    public Date fromCurrentDateTime() {
         return Date.from(getCurrentDateTime().toInstant());
     }
 
 
-    default Date fromCurrentDate() {
+    public Date fromCurrentDate() {
         return Date.from(getCurrentDate().atStartOfDay().atZone(getZone()).toInstant());
     }
 }

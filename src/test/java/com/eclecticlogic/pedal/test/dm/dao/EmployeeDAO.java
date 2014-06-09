@@ -16,7 +16,7 @@
  */
 package com.eclecticlogic.pedal.test.dm.dao;
 
-import com.eclecticlogic.pedal.dm.DateTimeAwareDAO;
+import com.eclecticlogic.pedal.dm.DateTimeProvider;
 import com.eclecticlogic.pedal.dm.TestableDAO;
 import com.eclecticlogic.pedal.test.dm.Employee;
 
@@ -24,7 +24,13 @@ import com.eclecticlogic.pedal.test.dm.Employee;
  * @author kabram.
  *
  */
-public class EmployeeDAO extends TestDAO<Employee, Integer> implements TestableDAO<Integer>, DateTimeAwareDAO {
+public class EmployeeDAO extends TestDAO<Employee, Integer> implements TestableDAO<Integer> {
+
+    public EmployeeDAO() {
+        super();
+        setDateTimeProvider(new DateTimeProvider());
+    }
+
 
     @Override
     public Class<Employee> getEntityClass() {

@@ -18,7 +18,7 @@ package com.eclecticlogic.pedal.test.dm.dao;
 
 import javax.annotation.PostConstruct;
 
-import com.eclecticlogic.pedal.dm.DateTimeAwareDAO;
+import com.eclecticlogic.pedal.dm.DateTimeProvider;
 import com.eclecticlogic.pedal.test.dm.Embedee;
 import com.eclecticlogic.pedal.test.dm.Master;
 
@@ -26,7 +26,13 @@ import com.eclecticlogic.pedal.test.dm.Master;
  * @author kabram.
  *
  */
-public class MasterDAO extends TestDAO<Master, Embedee> implements DateTimeAwareDAO {
+public class MasterDAO extends TestDAO<Master, Embedee> {
+
+    public MasterDAO() {
+        super();
+        setDateTimeProvider(new DateTimeProvider());
+    }
+
 
     @PostConstruct
     @Override

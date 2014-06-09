@@ -18,7 +18,7 @@ package com.eclecticlogic.pedal.test.dm.dao;
 
 import java.util.List;
 
-import com.eclecticlogic.pedal.dm.DateTimeAwareDAO;
+import com.eclecticlogic.pedal.dm.DateTimeProvider;
 import com.eclecticlogic.pedal.dm.TestableDAO;
 import com.eclecticlogic.pedal.test.dm.Manufacturer;
 
@@ -26,7 +26,13 @@ import com.eclecticlogic.pedal.test.dm.Manufacturer;
  * @author kabram.
  *
  */
-public class ManufacturerDAO extends TestDAO<Manufacturer, String> implements TestableDAO<String>, DateTimeAwareDAO {
+public class ManufacturerDAO extends TestDAO<Manufacturer, String> implements TestableDAO<String> {
+
+    public ManufacturerDAO() {
+        super();
+        setDateTimeProvider(new DateTimeProvider());
+    }
+
 
     @Override
     public Class<Manufacturer> getEntityClass() {
