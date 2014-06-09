@@ -17,21 +17,29 @@
 package com.eclecticlogic.pedal.dm;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.eclecticlogic.pedal.ProviderAccess;
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dm.internal.MetamodelUtil;
 import com.eclecticlogic.pedal.dm.internal.SelectImpl;
 import com.eclecticlogic.pedal.dm.internal.UpdateImpl;
 
@@ -40,6 +48,55 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     private Transaction transaction;
     private EntityManager entityManager;
     private ProviderAccess providerAccess;
+    private boolean insertDateTimeAware, insertDateAware, updateDateTimeAware, updateDateAware;
+
+
+    /**
+     * Subclasses should override this and call this via a @PostContruct annotation or other means. 
+     */
+    protected void init() {
+        if (this instanceof DateTimeAwareDAO) {
+            setupInsertDateTimeFlags();
+            setupUpdateDateTimeFlags();
+        }
+    }
+
+
+    private void setupUpdateDateTimeFlags() {
+        Attribute<? super E, ?> attr = getEntityType().getAttribute(((DateTimeAwareDAO) this).getUpdatedDateProperty());
+        if (attr != null) {
+            Temporal temporalAnnotation = null;
+            Member member = attr.getJavaMember();
+            if (member instanceof Field && ((Field) member).isAnnotationPresent(Temporal.class)) {
+                temporalAnnotation = ((Field) member).getAnnotation(Temporal.class);
+            } else if (member instanceof Method && ((Method) member).isAnnotationPresent(Temporal.class)) {
+                temporalAnnotation = ((Method) member).getAnnotation(Temporal.class);
+            }
+            if (temporalAnnotation != null) {
+                updateDateTimeAware = temporalAnnotation.value() == TemporalType.TIMESTAMP;
+                updateDateAware = temporalAnnotation.value() == TemporalType.DATE;
+            }
+        }
+    }
+
+
+    private void setupInsertDateTimeFlags() {
+        Attribute<? super E, ?> attr = getEntityType()
+                .getAttribute(((DateTimeAwareDAO) this).getInsertedDateProperty());
+        if (attr != null) {
+            Temporal temporalAnnotation = null;
+            Member member = attr.getJavaMember();
+            if (member instanceof Field && ((Field) member).isAnnotationPresent(Temporal.class)) {
+                temporalAnnotation = ((Field) member).getAnnotation(Temporal.class);
+            } else if (member instanceof Method && ((Method) member).isAnnotationPresent(Temporal.class)) {
+                temporalAnnotation = ((Method) member).getAnnotation(Temporal.class);
+            }
+            if (temporalAnnotation != null) {
+                insertDateTimeAware = temporalAnnotation.value() == TemporalType.TIMESTAMP;
+                insertDateAware = temporalAnnotation.value() == TemporalType.DATE;
+            }
+        }
+    }
 
 
     protected EntityManager getEntityManager() {
@@ -90,12 +147,23 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public E create(final E entity) {
-        return getTransaction().exec(() -> {
-            getEntityManager().persist(entity);
-            return entity;
-        });
+        return getTransaction().exec(
+                () -> {
+                    if (insertDateTimeAware) {
+                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                                ((DateTimeAwareDAO) this).getInsertedDateProperty());
+                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
+                    } else if (insertDateAware) {
+                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                                ((DateTimeAwareDAO) this).getInsertedDateProperty());
+                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
+                    }
+                    getEntityManager().persist(entity);
+                    return entity;
+                });
     }
 
 
@@ -147,13 +215,24 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public E update(final E entity) {
-        return getTransaction().exec(() -> {
-            E t = getEntityManager().merge(entity);
-            getEntityManager().persist(t);
-            return t;
-        });
+        return getTransaction().exec(
+                () -> {
+                    if (updateDateTimeAware) {
+                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                                ((DateTimeAwareDAO) this).getUpdatedDateProperty());
+                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
+                    } else if (updateDateAware) {
+                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                                ((DateTimeAwareDAO) this).getUpdatedDateProperty());
+                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
+                    }
+                    E t = getEntityManager().merge(entity);
+                    getEntityManager().persist(t);
+                    return t;
+                });
     }
 
 

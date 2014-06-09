@@ -18,6 +18,7 @@ package com.eclecticlogic.pedal.test.dm.dao;
 
 import java.io.Serializable;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -35,4 +36,10 @@ public abstract class TestDAO<E extends Serializable, P extends Serializable> ex
         super.setEntityManager(entityManager);
     }
 
+
+    @Override
+    @PostConstruct
+    public void init() {
+        super.init();
+    }
 }

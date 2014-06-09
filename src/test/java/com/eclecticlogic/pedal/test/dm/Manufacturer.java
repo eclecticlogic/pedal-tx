@@ -17,11 +17,14 @@
 package com.eclecticlogic.pedal.test.dm;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.google.common.base.Objects;
 
@@ -36,6 +39,8 @@ public class Manufacturer implements Serializable {
 
     private String name;
     private String location;
+    private Date insertedOn;
+    private Date updatedOn;
 
 
     @Id
@@ -58,6 +63,30 @@ public class Manufacturer implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "inserted_on", nullable = false)
+    public Date getInsertedOn() {
+        return insertedOn;
+    }
+
+
+    public void setInsertedOn(Date insertedOn) {
+        this.insertedOn = insertedOn;
+    }
+
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "updated_on")
+    public Date getUpdatedOn() {
+        return updatedOn;
+    }
+
+
+    public void setUpdatedOn(Date updatedOn) {
+        this.updatedOn = updatedOn;
     }
 
 

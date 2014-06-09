@@ -149,6 +149,17 @@ public class CrudTest extends AbstractTest {
         assertEquals(count, 2);
         assertEquals(dao.findById("update2").get().getLocation(), "Philadelphia");
     }
+    
+    
+    public void updateDateTimeTest() {
+        EmployeeDAO edao = getContext().getBean(EmployeeDAO.class);
+        Employee e = new Employee();
+        e.setName("updateTest");
+        edao.create(e);
+        
+        e.setName("updateTest updated");
+        edao.update(e);
+    }
 
 
     public void emptyQueryTest() {
