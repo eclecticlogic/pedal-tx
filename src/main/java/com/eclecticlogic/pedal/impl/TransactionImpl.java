@@ -132,8 +132,6 @@ public class TransactionImpl implements Transaction {
             if (status != null && status.isCompleted() == false) {
                 getPlatformTransactionManager().rollback(status);
                 logger.trace("rollback");
-            } else if (!status.isRollbackOnly()) {
-                logger.trace("Transaction already complete.");
             }
             throw e;
         }
