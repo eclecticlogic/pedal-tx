@@ -191,6 +191,10 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 
 # Release notes
 
+## 1.3.0
+
+- Added DateTimeAwareDAO to facilitate automatic setting of inserted-on, updated-on type fields. DAOs of entities that want automatic inserted-on/updated-on values populated in create()/update() methods should implement this interface. Methods of the interface may be overridden as necessary. TemporalType.TIMESTAMP and DATE are supported. See the ManufacturerDAO and EmployeeDAO test classes for a simple example.
+
 ## 1.2.1
 
 - Modified lock api to work with entity or id. 
