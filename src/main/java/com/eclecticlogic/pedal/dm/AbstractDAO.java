@@ -48,7 +48,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     private Transaction transaction;
     private EntityManager entityManager;
     private ProviderAccess providerAccess;
-    private boolean insertDateTimeAware, insertDateAware, updateDateTimeAware, updateDateAware;
+    private boolean insertDateTimeAware, insertDateAware, updateDateTimeAware, updateDateAware, updateDTRequired;
 
 
     /**
@@ -81,6 +81,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
                 updateDateTimeAware = temporalAnnotation.value() == TemporalType.TIMESTAMP;
                 updateDateAware = temporalAnnotation.value() == TemporalType.DATE;
             }
+            updateDTRequired = !((SingularAttribute<? super E, ?>) attr).isOptional();
         }
     }
 
@@ -170,6 +171,9 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
                                 ((DateTimeAwareDAO) this).getInsertedDateProperty());
                         MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
                     }
+                    if (updateDTRequired) {
+                        setUpdateDateTimeIfRequired(entity);
+                    }
                     getEntityManager().persist(entity);
                     return entity;
                 });
@@ -225,23 +229,27 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
 
     @SuppressWarnings("unchecked")
+    private void setUpdateDateTimeIfRequired(final E entity) {
+        if (updateDateTimeAware) {
+            Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                    ((DateTimeAwareDAO) this).getUpdatedDateProperty());
+            MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
+        } else if (updateDateAware) {
+            Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
+                    ((DateTimeAwareDAO) this).getUpdatedDateProperty());
+            MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
+        }
+    }
+
+
     @Override
     public E update(final E entity) {
-        return getTransaction().exec(
-                () -> {
-                    if (updateDateTimeAware) {
-                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                                ((DateTimeAwareDAO) this).getUpdatedDateProperty());
-                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDateTime());
-                    } else if (updateDateAware) {
-                        Attribute<? super E, Date> attr = (Attribute<? super E, Date>) getEntityType().getAttribute(
-                                ((DateTimeAwareDAO) this).getUpdatedDateProperty());
-                        MetamodelUtil.set(attr, entity, ((DateTimeAwareDAO) this).fromCurrentDate());
-                    }
-                    E t = getEntityManager().merge(entity);
-                    getEntityManager().persist(t);
-                    return t;
-                });
+        return getTransaction().exec(() -> {
+            setUpdateDateTimeIfRequired(entity);
+            E t = getEntityManager().merge(entity);
+            getEntityManager().persist(t);
+            return t;
+        });
     }
 
 

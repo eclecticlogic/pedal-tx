@@ -79,7 +79,7 @@ public class Manufacturer implements Serializable {
 
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "updated_on")
+    @Column(name = "updated_on", nullable = false)
     public Date getUpdatedOn() {
         return updatedOn;
     }
