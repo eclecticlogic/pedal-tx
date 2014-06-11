@@ -29,11 +29,11 @@ public interface CopyCapable {
     /**
      * @return List of column names for the copy command.
      */
-    public List<String> getCopyColumnNames();
+    public List<String> copyColumnNames();
     
     
     /**
      * @return Values for the columns (nulls should be entered as nulls).
      */
-    public List<Object> getCopyColumnValues();
+    public List<Object> copyColumnValues();
 }

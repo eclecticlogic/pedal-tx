@@ -18,6 +18,7 @@ package com.eclecticlogic.pedal.provider.hibernate.dialect;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * List of entities to be inserted via the CopyCommand
@@ -29,6 +30,21 @@ import java.util.ArrayList;
 public class CopyList<E extends Serializable> extends ArrayList<E> {
 
     private String alternateTableName;
+
+
+    public CopyList() {
+        super();
+    }
+
+
+    public CopyList(Collection<? extends E> c) {
+        super(c);
+    }
+
+
+    public CopyList(int initialCapacity) {
+        super(initialCapacity);
+    }
 
 
     /**

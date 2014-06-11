@@ -82,7 +82,7 @@ public class CopyListReader<E extends Serializable> extends Reader {
 
     private String copyEncode(E entity) {
         if (entity instanceof CopyCapable) {
-            List<Object> values = ((CopyCapable) entity).getCopyColumnValues();
+            List<Object> values = ((CopyCapable) entity).copyColumnValues();
             StringBuilder builder = new StringBuilder();
             for (Object value : values) {
                 builder.append("\t");
@@ -94,8 +94,10 @@ public class CopyListReader<E extends Serializable> extends Reader {
             }
             builder.append("\n");
             return builder.substring(1);
+        } else {
+            throw new UnsupportedOperationException(
+                    "No support for copy insert of entites that don't implement CopyCapable");
         }
-        return null;
     }
 
 
@@ -104,5 +106,4 @@ public class CopyListReader<E extends Serializable> extends Reader {
         buffer = null;
     }
 
-    
 }

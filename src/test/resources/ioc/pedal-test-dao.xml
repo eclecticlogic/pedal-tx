@@ -18,13 +18,22 @@
 	<!-- Sample way to configure autoscan for daos when using only a single database (majority of apps). -->
 	<!-- <context:component-scan base-package="com.eclecticlogic.pedal.test.dm.dao" /> -->
 
+    <bean id="copyCommand" class="com.eclecticlogic.pedal.provider.hibernate.dialect.CopyCommand">
+        <property name="providerAccessSpi" ref="hibernateProviderAccess"/>
+        <property name="connectionAccessor">
+            <bean class="com.eclecticlogic.pedal.provider.BoneCPConnectionAccessor" />
+        </property>
+    </bean>
+
 	<bean id="abstractDAO" abstract="true" class="com.eclecticlogic.pedal.test.dm.dao.TestDAO">
 		<property name="transaction" ref="tx" />
 		<property name="providerAccess" ref="hibernateProviderAccess" />
 	</bean>
 
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO" />
-	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.StudentDAO" />
+	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.StudentDAO">
+        <property name="copyCommand" ref="copyCommand" />
+    </bean>
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.EmployeeDAO" />
 	
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.PrimusDAO" />

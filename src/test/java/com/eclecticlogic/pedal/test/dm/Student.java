@@ -17,6 +17,8 @@
 package com.eclecticlogic.pedal.test.dm;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -27,6 +29,9 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.eclecticlogic.pedal.provider.hibernate.dialect.CopyCapable;
+import com.google.common.collect.Lists;
+
 /**
  * @author kabram.
  *
@@ -34,7 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "student")
-public class Student implements Serializable {
+public class Student implements Serializable, CopyCapable {
 
     private String id;
     private String name;
@@ -87,4 +92,16 @@ public class Student implements Serializable {
         this.zone = zone;
     }
 
+
+    @Override
+    public List<String> copyColumnNames() {
+        return Lists.newArrayList("student_id", "name", "grade", "zone");
+    }
+
+
+    @Override
+    public List<Object> copyColumnValues() {
+        setId(UUID.randomUUID().toString());
+        return Lists.newArrayList(getId(), getName(), getGrade().getCode(), getZone());
+    }
 }

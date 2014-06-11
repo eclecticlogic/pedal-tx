@@ -24,4 +24,10 @@
 			<class name="com.eclecticlogic.pedal.forward.TestExoticTypes" />
 		</classes>
 	</test>
+    
+    <test name="copy">
+        <classes>
+            <class name="com.eclecticlogic.pedal.test.TestCopyCommand" />
+        </classes>
+    </test>
 </suite>

@@ -16,9 +16,7 @@
  */
 package com.eclecticlogic.pedal.provider.hibernate.dialect;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 
 import javax.persistence.EntityManager;
 
@@ -52,36 +50,23 @@ public class CopyCommand {
 
 
     /**
-     * @param context Pedal context
      * @param lists Entities to be inserted using the Postgres COPY command.
      */
-    @SuppressWarnings("unchecked")
-    public <E extends Serializable> void insert(EntityManager entityManager, CopyList<E>... lists) {
-        if (lists != null) {
-            providerAccessSpi.run(
-                    entityManager,
-                    connection -> {
-                        try {
-                            CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
-                                    .getRawConnection(connection));
-                            for (CopyList<E> copyList : lists) {
-                                _insert(copyManager, copyList);
-                            }
-                        } catch (Exception e) {
-                            throw Throwables.propagate(e);
+    public <E extends Serializable> void insert(EntityManager entityManager, CopyList<E> entityList) {
+        providerAccessSpi.run(
+                entityManager,
+                connection -> {
+                    try {
+                        CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
+                                .getRawConnection(connection));
+                        if (entityList.size() != 0) {
+                            copyManager.copyIn("copy " + getEntityName(entityList) + "(" + getFieldNames(entityList)
+                                    + ") from stdin", new CopyListReader<E>(entityList));
                         }
-                    });
-
-        }
-    }
-
-
-    private <E extends Serializable> void _insert(CopyManager copyManager, CopyList<E> copyList) throws IOException,
-            SQLException {
-        if (copyList.size() != 0) {
-            copyManager.copyIn("copy " + getEntityName(copyList) + "(" + getFieldNames(copyList) + ") from stdin",
-                    new CopyListReader<E>(copyList));
-        }
+                    } catch (Exception e) {
+                        throw Throwables.propagate(e);
+                    }
+                });
     }
 
 
@@ -102,7 +87,7 @@ public class CopyCommand {
     private <E extends Serializable> String getFieldNames(CopyList<E> copyList) {
         E entity = copyList.get(0);
         if (entity instanceof CopyCapable) {
-            return String.join(", ", ((CopyCapable) entity).getCopyColumnNames());
+            return String.join(", ", ((CopyCapable) entity).copyColumnNames());
         } else {
             throw new UnsupportedOperationException();
         }
