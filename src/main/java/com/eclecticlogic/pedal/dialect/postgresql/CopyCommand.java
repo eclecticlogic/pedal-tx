@@ -173,7 +173,10 @@ public class CopyCommand {
             List<Method> methods = new ArrayList<>();
             for (Method method : clz.getMethods()) {
                 String columnName = null;
-                if (method.isAnnotationPresent(Column.class)) {
+                if (method.isAnnotationPresent(Id.class) && method.isAnnotationPresent(GeneratedValue.class)
+                        && method.getAnnotation(GeneratedValue.class).strategy() == GenerationType.IDENTITY) {
+                    // Ignore pk with identity strategy.
+                } else if (method.isAnnotationPresent(Column.class)) {
                     columnName = method.getAnnotation(Column.class).name();
                 } else if (method.isAnnotationPresent(JoinColumn.class)) {
                     columnName = method.getAnnotation(JoinColumn.class).name();
