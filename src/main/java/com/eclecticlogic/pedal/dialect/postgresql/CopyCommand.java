@@ -178,7 +178,8 @@ public class CopyCommand {
                     // Ignore pk with identity strategy.
                 } else if (method.isAnnotationPresent(Column.class)) {
                     columnName = method.getAnnotation(Column.class).name();
-                } else if (method.isAnnotationPresent(JoinColumn.class)) {
+                } else if (method.isAnnotationPresent(JoinColumn.class)
+                        && method.getAnnotation(JoinColumn.class).insertable()) {
                     columnName = method.getAnnotation(JoinColumn.class).name();
                 }
                 if (columnName != null) {
