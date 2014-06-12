@@ -19,6 +19,7 @@ package com.eclecticlogic.pedal.test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -64,6 +65,46 @@ public class CrudTest extends AbstractTest {
 
         assertEquals(dao.findById("test").isPresent(), true);
         assertEquals(dao.findById("test").get().getLocation(), "USA");
+    }
+
+
+    public void testVariadicCreation() {
+        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+
+        Manufacturer m1 = new Manufacturer();
+        m1.setName("variadic1");
+        m1.setLocation("USA");
+        Manufacturer m2 = new Manufacturer();
+        m2.setName("variadic2");
+        m2.setLocation("USA");
+        Manufacturer m3 = new Manufacturer();
+        m3.setName("variadic3");
+        m3.setLocation("USA");
+        Collection<Manufacturer> col = dao.create(m1, m2, m3);
+
+        assertEquals(col.size(), 3);
+        assertTrue(dao.findById("variadic3").isPresent());
+        assertTrue(dao.findById("variadic1").isPresent());
+    }
+
+
+    public void testCollectionCreation() {
+        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+
+        Manufacturer m1 = new Manufacturer();
+        m1.setName("collection1");
+        m1.setLocation("USA");
+        Manufacturer m2 = new Manufacturer();
+        m2.setName("collection2");
+        m2.setLocation("USA");
+        Manufacturer m3 = new Manufacturer();
+        m3.setName("collection3");
+        m3.setLocation("USA");
+        Collection<? extends Manufacturer> col = dao.create(Lists.newArrayList(m1, m2, m3));
+
+        assertEquals(col.size(), 3);
+        assertTrue(dao.findById("collection3").isPresent());
+        assertTrue(dao.findById("collection1").isPresent());
     }
 
 
@@ -152,14 +193,14 @@ public class CrudTest extends AbstractTest {
         assertEquals(count, 2);
         assertEquals(dao.findById("update2").get().getLocation(), "Philadelphia");
     }
-    
-    
+
+
     public void updateDateTimeTest() {
         EmployeeDAO edao = getContext().getBean(EmployeeDAO.class);
         Employee e = new Employee();
         e.setName("updateTest");
         edao.create(e);
-        
+
         e.setName("updateTest updated");
         edao.update(e);
     }
@@ -213,7 +254,7 @@ public class CrudTest extends AbstractTest {
         t.setId(1);
         t.setName("joe");
         tdao.create(t);
-        
+
         StudentDAO sdao = getContext().getBean(StudentDAO.class);
         Student student = new Student();
         student.setGrade(Grade.A);
@@ -223,15 +264,15 @@ public class CrudTest extends AbstractTest {
         student.setInsertedOn(new Date());
         sdao.create(student);
     }
-    
-    
+
+
     public void testEmbedded() {
         MasterDAO mdao = getContext().getBean(MasterDAO.class);
-        
+
         Embedee e = new Embedee();
         e.setId(5);
         e.setName(Name.JOE);
-        
+
         Master m = new Master();
         m.setId(e);
         m.setDescription("Some text here");
@@ -240,11 +281,11 @@ public class CrudTest extends AbstractTest {
         assertTrue(m2.isPresent());
         assertEquals(m2.get().getId().getName(), Name.JOE);
     }
-    
-    
+
+
     public void testViaDAORegistry() {
         DAORegistry registry = getContext().getBean(DAORegistry.class);
-        
+
         registry.testDAOs();
     }
 }

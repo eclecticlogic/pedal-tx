@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -189,6 +190,18 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     @SuppressWarnings("unchecked")
     @Override
     public List<E> create(final E... entities) {
+        return getTransaction().exec(() -> {
+            List<E> list = new ArrayList<>();
+            for (E e : entities) {
+                list.add(create(e));
+            }
+            return list;
+        });
+    }
+
+
+    @Override
+    public List<? extends E> create(Collection<? extends E> entities) {
         return getTransaction().exec(() -> {
             List<E> list = new ArrayList<>();
             for (E e : entities) {

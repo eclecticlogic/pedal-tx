@@ -17,6 +17,7 @@
 package com.eclecticlogic.pedal.dm;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,13 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
      */
     @SuppressWarnings("unchecked")
     public List<E> create(E... entities);
+
+
+    /**
+     * @param entities Collection of entities
+     * @return List of entities that were created.
+     */
+    public List<? extends E> create(Collection<? extends E> entities);
 
 
     public Optional<E> findById(P id);
@@ -75,8 +83,8 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
      * @return Locked entity refreshed to reflect state after locking.
      */
     public E lock(E entity, LockModeType lockMode);
-    
-    
+
+
     /**
      * @param id Primary key of row to be locked.
      * @param lockMode Locking mode
