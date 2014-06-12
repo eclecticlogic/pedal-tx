@@ -19,13 +19,17 @@ package com.eclecticlogic.pedal.test;
 import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.testng.annotations.Test;
 
 import com.eclecticlogic.pedal.test.dm.Grade;
 import com.eclecticlogic.pedal.test.dm.Student;
+import com.eclecticlogic.pedal.test.dm.Teacher;
 import com.eclecticlogic.pedal.test.dm.dao.StudentDAO;
+import com.eclecticlogic.pedal.test.dm.dao.TeacherDAO;
 
 /**
  * @author kabram.
@@ -37,55 +41,82 @@ public class TestCopyCommand extends AbstractTest {
     public void bulkInsertStudents() {
         StudentDAO sdao = getContext().getBean(StudentDAO.class);
 
+        TeacherDAO tdao = getContext().getBean(TeacherDAO.class);
+        Teacher t = new Teacher();
+        t.setId(1);
+        t.setName("joe");
+        tdao.create(t);
+        
         List<Student> list = new ArrayList<>();
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("a");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("b");
             s.setGrade(Grade.B);
             s.setZone("a2");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("c");
             s.setGrade(Grade.C);
             s.setZone("a3");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("d");
             s.setGrade(Grade.D);
             s.setZone("a4");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
 
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("e");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("f");
             s.setGrade(Grade.B);
             s.setZone("a1");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
         {
             Student s = new Student();
+            s.setId(UUID.randomUUID().toString());
             s.setName("g");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setInsertedOn(new Date());
+            s.setTeacher(t);
             list.add(s);
         }
 

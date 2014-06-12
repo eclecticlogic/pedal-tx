@@ -191,6 +191,10 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 
 # Release notes
 
+## 1.3.6
+
+- Modified copy-command support to build copy string automatically.
+
 ## 1.3.5
 
 - Bug fixes

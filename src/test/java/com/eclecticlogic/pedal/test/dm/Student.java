@@ -17,20 +17,19 @@
 package com.eclecticlogic.pedal.test.dm;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
-
-import com.eclecticlogic.pedal.provider.hibernate.dialect.CopyCapable;
-import com.google.common.collect.Lists;
 
 /**
  * @author kabram.
@@ -39,12 +38,14 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "student")
-public class Student implements Serializable, CopyCapable {
+public class Student implements Serializable {
 
     private String id;
     private String name;
     private Grade grade;
     private String zone;
+    private Teacher teacher;
+    private Date insertedOn;
 
 
     @Id
@@ -72,6 +73,7 @@ public class Student implements Serializable, CopyCapable {
     }
 
 
+    @Column(name = "grade", nullable = true, length = 1)
     @Convert(converter = GradeConverter.class)
     public Grade getGrade() {
         return grade;
@@ -83,6 +85,7 @@ public class Student implements Serializable, CopyCapable {
     }
 
 
+    @Column(name = "zone", length = 5)
     public String getZone() {
         return zone;
     }
@@ -93,15 +96,26 @@ public class Student implements Serializable, CopyCapable {
     }
 
 
-    @Override
-    public List<String> copyColumnNames() {
-        return Lists.newArrayList("student_id", "name", "grade", "zone");
+    @JoinColumn(name = "teacher_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Teacher getTeacher() {
+        return teacher;
     }
 
 
-    @Override
-    public List<Object> copyColumnValues() {
-        setId(UUID.randomUUID().toString());
-        return Lists.newArrayList(getId(), getName(), getGrade().getCode(), getZone());
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
+
+
+    @Column(name = "inserted_on", nullable = false)
+    public Date getInsertedOn() {
+        return insertedOn;
+    }
+
+
+    public void setInsertedOn(Date insertedOn) {
+        this.insertedOn = insertedOn;
+    }
+
 }

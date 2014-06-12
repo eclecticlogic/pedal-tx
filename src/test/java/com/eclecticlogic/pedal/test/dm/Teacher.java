@@ -14,26 +14,45 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.provider.hibernate.dialect;
+package com.eclecticlogic.pedal.test.dm;
 
-import java.util.List;
+import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
- * Entities that implement this interface are able to directly return the values required for inserting a row.
  * @author kabram.
  *
  */
-public interface CopyCapable {
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "teacher")
+public class Teacher implements Serializable {
 
-    /**
-     * @return List of column names for the copy command.
-     */
-    public List<String> copyColumnNames();
-    
-    
-    /**
-     * @return Values for the columns (nulls should be entered as nulls).
-     */
-    public List<Object> copyColumnValues();
+    private int id;
+    private String name;
+
+
+    @Id
+    public int getId() {
+        return id;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

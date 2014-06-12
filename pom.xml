@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Pedal - The idiomatic JPA DAO framework.</name>
@@ -175,7 +176,7 @@
                     <processors>
                         <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
                     </processors>
-<!--                     <defaultOutputDirectory>src/test/java</defaultOutputDirectory> -->
+                    <!-- <defaultOutputDirectory>src/test/java</defaultOutputDirectory> -->
                     <addCompileSourceRoots>true</addCompileSourceRoots>
                 </configuration>
                 <dependencies>
@@ -198,13 +199,18 @@
                         </path>
                         <property name="hibernate_tools_classpath" refid="hibernate_tools_path" />
                         <echo message="hibernate_tools classpath: ${hibernate_tools_classpath}" />
-                        <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" classpathref="maven.plugin.classpath" />
+                        <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask"
+                            classpathref="maven.plugin.classpath" />
                         <hibernatetool>
-                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties" revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true" detectOptimisticLock="true" />
+                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties"
+                                revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true"
+                                detectOptimisticLock="true" />
                             <hbm2cfgxml ejb3="true" destdir="src/gen/config" />
                         </hibernatetool>
                         <hibernatetool>
-                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties" revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true" detectOptimisticLock="true" />
+                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties"
+                                revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true"
+                                detectOptimisticLock="true" />
                             <hbm2java jdk5="true" ejb3="true" destdir="src/gen/java" />
                         </hibernatetool>
                     </tasks>
@@ -251,6 +257,14 @@
     </dependencyManagement>
 
     <dependencies>
+<!--         <dependency> -->
+<!--             <groupId>org.javassist</groupId> -->
+<!--             <artifactId>javassist</artifactId> -->
+<!--             <version>3.18.2-GA</version> -->
+<!--             <type>jar</type> -->
+<!--             <scope>provided</scope> -->
+<!--         </dependency> -->
+        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

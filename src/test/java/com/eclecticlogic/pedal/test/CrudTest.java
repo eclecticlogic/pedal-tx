@@ -20,6 +20,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +37,14 @@ import com.eclecticlogic.pedal.test.dm.Name;
 import com.eclecticlogic.pedal.test.dm.Primus;
 import com.eclecticlogic.pedal.test.dm.Secundus;
 import com.eclecticlogic.pedal.test.dm.Student;
+import com.eclecticlogic.pedal.test.dm.Teacher;
 import com.eclecticlogic.pedal.test.dm.dao.EmployeeDAO;
 import com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO;
 import com.eclecticlogic.pedal.test.dm.dao.MasterDAO;
 import com.eclecticlogic.pedal.test.dm.dao.PrimusDAO;
 import com.eclecticlogic.pedal.test.dm.dao.SecundusDAO;
 import com.eclecticlogic.pedal.test.dm.dao.StudentDAO;
+import com.eclecticlogic.pedal.test.dm.dao.TeacherDAO;
 import com.google.common.collect.Lists;
 
 /**
@@ -205,11 +208,19 @@ public class CrudTest extends AbstractTest {
 
 
     public void testWithConverter() {
+        TeacherDAO tdao = getContext().getBean(TeacherDAO.class);
+        Teacher t = new Teacher();
+        t.setId(1);
+        t.setName("joe");
+        tdao.create(t);
+        
         StudentDAO sdao = getContext().getBean(StudentDAO.class);
         Student student = new Student();
         student.setGrade(Grade.A);
         student.setName("Joe");
         student.setZone("AZ");
+        student.setTeacher(t);
+        student.setInsertedOn(new Date());
         sdao.create(student);
     }
     

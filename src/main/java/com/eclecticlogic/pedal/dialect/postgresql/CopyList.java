@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.provider.hibernate.dialect;
+package com.eclecticlogic.pedal.dialect.postgresql;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -7,6 +7,7 @@
 	<session-factory>
 		<mapping class="com.eclecticlogic.pedal.test.dm.Manufacturer" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Student" />
+        <mapping class="com.eclecticlogic.pedal.test.dm.Teacher" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Employee" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Primus" />
 		<mapping class="com.eclecticlogic.pedal.test.dm.Secundus" />
