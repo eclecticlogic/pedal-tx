@@ -42,6 +42,8 @@ import javax.persistence.JoinColumn;
 
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eclecticlogic.pedal.provider.ConnectionAccessor;
 import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
@@ -69,6 +71,8 @@ public class CopyCommand {
     private ConcurrentHashMap<Class<? extends Serializable>, CopyExtractor<? extends Serializable>> extractorsByClass = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Class<? extends Serializable>, List<MethodHandle>> methodHandlesByClass = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Class<? extends Serializable>, List<Method>> methodsByClass = new ConcurrentHashMap<>();
+
+    private static Logger logger = LoggerFactory.getLogger(CopyCommand.class);
 
 
     public void setConnectionAccessor(ConnectionAccessor connectionAccessor) {
@@ -112,6 +116,8 @@ public class CopyCommand {
                         copyManager.copyIn("copy " + getEntityName(entityList) + "(" + fieldNames + ") from stdin",
                                 reader);
                     } catch (Exception e) {
+                        logger.trace("Command passed: copy {} ( {} ) from stdin {}", getEntityName(entityList),
+                                fieldNames, builder);
                         throw Throwables.propagate(e);
                     }
                 });
