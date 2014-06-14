@@ -54,6 +54,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("a");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setGpa(4.0f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -64,6 +65,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("b");
             s.setGrade(Grade.B);
             s.setZone("a2");
+            s.setGpa(3.9f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -74,6 +76,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("c");
             s.setGrade(Grade.C);
             s.setZone("a3");
+            s.setGpa(3.75f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -84,6 +87,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("d");
             s.setGrade(Grade.D);
             s.setZone("a4");
+            s.setGpa(4.0f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -95,6 +99,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("e");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setGpa(3.85f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -105,6 +110,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("f");
             s.setGrade(Grade.B);
             s.setZone("a1");
+            s.setGpa(3.54f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);
@@ -115,6 +121,7 @@ public class TestCopyCommand extends AbstractTest {
             s.setName("g");
             s.setGrade(Grade.A);
             s.setZone("a1");
+            s.setGpa(3.0f);
             s.setInsertedOn(new Date());
             s.setTeacher(t);
             list.add(s);

@@ -45,6 +45,7 @@ public class Student implements Serializable {
     private Grade grade;
     private String zone;
     private Teacher teacher;
+    private float gpa;
     private Date insertedOn;
 
 
@@ -82,6 +83,17 @@ public class Student implements Serializable {
 
     public void setGrade(Grade grade) {
         this.grade = grade;
+    }
+
+
+    @Column(name = "gpa", nullable = false)
+    public float getGpa() {
+        return gpa;
+    }
+
+
+    public void setGpa(float gpa) {
+        this.gpa = gpa;
     }
 
 

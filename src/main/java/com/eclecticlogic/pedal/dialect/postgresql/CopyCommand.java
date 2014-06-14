@@ -18,8 +18,6 @@ package com.eclecticlogic.pedal.dialect.postgresql;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,6 @@ import javassist.CtClass;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
 
-import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.EntityManager;
@@ -67,10 +64,7 @@ public class CopyCommand {
     private ProviderAccessSpi providerAccessSpi;
 
     private ConcurrentHashMap<Class<? extends Serializable>, String> fieldNamesByClass = new ConcurrentHashMap<>();
-    @SuppressWarnings("unused")
     private ConcurrentHashMap<Class<? extends Serializable>, CopyExtractor<? extends Serializable>> extractorsByClass = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Class<? extends Serializable>, List<MethodHandle>> methodHandlesByClass = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Class<? extends Serializable>, List<Method>> methodsByClass = new ConcurrentHashMap<>();
 
     private static Logger logger = LoggerFactory.getLogger(CopyCommand.class);
 
@@ -95,14 +89,15 @@ public class CopyCommand {
     }
 
 
+    @SuppressWarnings("unchecked")
     private <E extends Serializable> void _insert(EntityManager entityManager, CopyList<E> entityList) {
         Class<? extends Serializable> clz = entityList.get(0).getClass();
         setupFor(clz);
         String fieldNames = fieldNamesByClass.get(clz);
-        // CopyExtractor<E> extractor = (CopyExtractor<E>) extractorsByClass.get(clz);
+        CopyExtractor<E> extractor = (CopyExtractor<E>) extractorsByClass.get(clz);
         StringBuilder builder = new StringBuilder(1024 * entityList.size());
         for (E entity : entityList) {
-            builder.append(getValueList(methodHandlesByClass.get(clz), methodsByClass.get(clz), entity));
+            builder.append(extractor.getValueList(entity));
             builder.append("\n");
         }
 
@@ -124,52 +119,9 @@ public class CopyCommand {
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <E extends Serializable> String getValueList(List<MethodHandle> methodHandles, List<Method> methods,
-            E entity) {
-        try {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < methods.size(); i++) {
-                Method method = methods.get(i);
-                Object value = methodHandles.get(i).invoke(entity);
-
-                if (method.isAnnotationPresent(Id.class) && method.isAnnotationPresent(GeneratedValue.class)
-                        && method.getAnnotation(GeneratedValue.class).strategy() == GenerationType.IDENTITY) {
-                    // Ignore identity columns.
-                } else if (value == null) {
-                    builder.append("\\N");
-                } else if (method.isAnnotationPresent(Convert.class)) {
-                    Class<? extends AttributeConverter<?, ?>> converterClass = method.getAnnotation(Convert.class)
-                            .converter();
-
-                    AttributeConverter converter = converterClass.newInstance();
-                    builder.append(converter.convertToDatabaseColumn(value));
-                } else if (method.isAnnotationPresent(JoinColumn.class)) {
-                    // We need to get the id of the joined object.
-                    for (Method method2 : value.getClass().getMethods()) {
-                        if (method2.isAnnotationPresent(Id.class)) {
-                            builder.append(method2.invoke(value));
-                        }
-                    }
-                } else {
-                    builder.append(value);
-                }
-
-                if (i != methods.size() - 1) {
-                    builder.append("\t");
-                }
-            }
-            return builder.toString();
-        } catch (Throwable e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
-
     private void setupFor(Class<? extends Serializable> clz) {
         if (fieldNamesByClass.get(clz) == null) {
             List<String> fields = new ArrayList<>();
-            List<MethodHandle> methodHandles = new ArrayList<>();
             List<Method> methods = new ArrayList<>();
             for (Method method : clz.getMethods()) {
                 String columnName = null;
@@ -186,18 +138,11 @@ public class CopyCommand {
                     // Certain one-to-on join situations can lead to multiple columns with the same column-name.
                     if (!fields.contains(columnName)) {
                         fields.add(columnName);
-                        try {
-                            methodHandles.add(MethodHandles.lookup().unreflect(method));
-                            methods.add(method);
-                        } catch (IllegalAccessException e) {
-                            throw Throwables.propagate(e);
-                        }
+                        methods.add(method);
                     }
                 } // end if annotation present
             }
-            // extractorsByClass.put(clz, getExtractor(clz, fieldMethods));
-            methodsByClass.put(clz, methods);
-            methodHandlesByClass.put(clz, methodHandles);
+            extractorsByClass.put(clz, getExtractor(clz, methods));
             fieldNamesByClass.put(clz, String.join(",", fields));
         }
     }
@@ -206,14 +151,16 @@ public class CopyCommand {
     /**
      * Revisit this after javassist support java 8
      */
-    @SuppressWarnings({ "unchecked", "unused" })
+    @SuppressWarnings({ "unchecked" })
     private <E extends Serializable> CopyExtractor<E> getExtractor(Class<E> clz, List<Method> fieldMethods) {
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.makeClass("com.eclecticlogic.pedal.dialect.postgresql." + clz.getSimpleName()
                 + "$CopyExtractor");
+        
+        StringBuilder methodBody = new StringBuilder();
         try {
             cc.addInterface(pool.getCtClass(CopyExtractor.class.getName()));
-            StringBuilder methodBody = new StringBuilder();
+            
             methodBody.append("public String getValueList(Object entity) {\n");
             methodBody.append("try {\n");
             methodBody.append("StringBuilder builder = new StringBuilder();\n");
@@ -221,14 +168,29 @@ public class CopyCommand {
             for (int i = 0; i < fieldMethods.size(); i++) {
                 Method method = fieldMethods.get(i);
                 if (method.getReturnType().isPrimitive()) {
-                    methodBody.append("builder.append(typed." + method.getName() + "();\n");
-                } else if (method.isAnnotationPresent(Convert.class)) {
-                    Class<?> converterClass = method.getAnnotation(Convert.class).converter();
-                    methodBody.append(converterClass.getName() + " c" + i + " = " + converterClass.getName()
-                            + ".class.newInstance();\n");
-                    // methodBody.append("c" + i + ".convertToDatabaseColumn(typed." + method.getName() + "());\n");
-                    methodBody.append("System.out.println(c" + i + ".convertToEntityAttribute(new Character('A')));");
                     methodBody.append("builder.append(typed." + method.getName() + "());\n");
+                } else {
+                    methodBody.append(method.getReturnType().getName() + " v" + i + " = typed." + method.getName()
+                            + "();\n");
+                    methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
+                    methodBody.append("else {\n");
+
+                    if (method.isAnnotationPresent(Convert.class)) {
+                        Class<?> converterClass = method.getAnnotation(Convert.class).converter();
+                        methodBody.append(converterClass.getName() + " c" + i + " = (" + converterClass.getName() + ")"
+                                + converterClass.getName() + ".class.newInstance();\n");
+                        methodBody.append("builder.append(c" + i + ".convertToDatabaseColumn(v" + i + "));\n");
+                    } else if (method.isAnnotationPresent(JoinColumn.class)) {
+                        // We need to get the id of the joined object.
+                        for (Method method2 : method.getReturnType().getMethods()) {
+                            if (method2.isAnnotationPresent(Id.class)) {
+                                methodBody.append("builder.append(v" + i + "." + method2.getName() + "());\n");
+                            }
+                        }
+                    } else {
+                        methodBody.append("builder.append(v" + i + ");\n");
+                    }
+                    methodBody.append("}\n");
                 }
                 if (i != fieldMethods.size() - 1) {
                     methodBody.append("builder.append(\"\\t\");\n");
@@ -237,9 +199,10 @@ public class CopyCommand {
             methodBody.append("return builder.toString();\n");
             methodBody.append("} catch (Exception e) { throw new RuntimeException(e); } \n");
             methodBody.append("}\n");
-            System.out.println(methodBody);
+            logger.trace(methodBody.toString());
             cc.addMethod(CtNewMethod.make(methodBody.toString(), cc));
         } catch (NotFoundException | CannotCompileException e) {
+            logger.error(e.getMessage(), "Compiled body is:\n" + methodBody.toString());
             throw Throwables.propagate(e);
         }
 

@@ -260,6 +260,7 @@ public class CrudTest extends AbstractTest {
         student.setGrade(Grade.A);
         student.setName("Joe");
         student.setZone("AZ");
+        student.setGpa(3.8f);
         student.setTeacher(t);
         student.setInsertedOn(new Date());
         sdao.create(student);
