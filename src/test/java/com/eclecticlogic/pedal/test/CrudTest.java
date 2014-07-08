@@ -80,7 +80,7 @@ public class CrudTest extends AbstractTest {
         Manufacturer m3 = new Manufacturer();
         m3.setName("variadic3");
         m3.setLocation("USA");
-        Collection<Manufacturer> col = dao.create(m1, m2, m3);
+        Collection<? extends Manufacturer> col = dao.create(Lists.newArrayList(m1, m2, m3));
 
         assertEquals(col.size(), 3);
         assertTrue(dao.findById("variadic3").isPresent());

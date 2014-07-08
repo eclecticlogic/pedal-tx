@@ -191,6 +191,10 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 
 # Release notes
 
+## 1.3.10
+
+- Simplified vararg methods in DAO to make it easier to work with mock frameworks.
+
 ## 1.3.9
 
 - Introduced Javassist based copy-command data extractor.

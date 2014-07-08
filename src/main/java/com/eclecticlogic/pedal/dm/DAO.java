@@ -39,14 +39,6 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
 
 
     /**
-     * @param entities Collection of entries to create.
-     * @return List of the entries that were created.
-     */
-    @SuppressWarnings("unchecked")
-    public List<E> create(E... entities);
-
-
-    /**
      * @param entities Collection of entities
      * @return List of entities that were created.
      */
@@ -56,8 +48,7 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
     public Optional<E> findById(P id);
 
 
-    @SuppressWarnings("unchecked")
-    public List<E> findById(P... ids);
+    public List<E> findById(Collection<? extends P> ids);
 
 
     public List<E> findAll();
@@ -66,15 +57,13 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
     public E update(E entity);
 
 
-    @SuppressWarnings("unchecked")
-    public List<E> update(E... entities);
+    public List<E> update(Collection<? extends E> entities);
 
 
     public E delete(E entity);
 
 
-    @SuppressWarnings("unchecked")
-    public List<E> delete(E... entities);
+    public List<E> delete(Collection<? extends E> entities);
 
 
     /**

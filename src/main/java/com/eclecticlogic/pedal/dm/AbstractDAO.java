@@ -187,19 +187,6 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<E> create(final E... entities) {
-        return getTransaction().exec(() -> {
-            List<E> list = new ArrayList<>();
-            for (E e : entities) {
-                list.add(create(e));
-            }
-            return list;
-        });
-    }
-
-
     @Override
     public List<? extends E> create(Collection<? extends E> entities) {
         return getTransaction().exec(() -> {
@@ -220,14 +207,13 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<E> findById(final P... ids) {
+    public List<E> findById(final Collection<? extends P> ids) {
         return getTransaction().exec((context) -> {
             CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
             CriteriaQuery<E> cq = builder.createQuery(getEntityClass());
             Root<E> root = cq.from(getEntityClass());
-            cq.select(root).where(builder.in(root.get(getIdProperty())).in((Object[]) ids));
+            cq.select(root).where(builder.in(root.get(getIdProperty())).in(ids));
             TypedQuery<E> query = getEntityManager().createQuery(cq);
             return query.getResultList();
         });
@@ -272,9 +258,8 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<E> update(final E... entities) {
+    public List<E> update(final Collection<? extends E> entities) {
         return getTransaction().exec(() -> {
             List<E> list = new ArrayList<>();
             for (E e : entities) {
@@ -295,9 +280,8 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<E> delete(final E... entities) {
+    public List<E> delete(final Collection<? extends E> entities) {
         return getTransaction().exec(() -> {
             List<E> list = new ArrayList<>();
             for (E e : entities) {
