@@ -43,6 +43,7 @@ import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.internal.MetamodelUtil;
 import com.eclecticlogic.pedal.dm.internal.SelectImpl;
 import com.eclecticlogic.pedal.dm.internal.UpdateImpl;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractDAO<E extends Serializable, P extends Serializable> implements DAO<E, P>, DAOMeta<E, P> {
 
@@ -209,14 +210,19 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
 
     @Override
     public List<E> findById(final Collection<? extends P> ids) {
-        return getTransaction().exec((context) -> {
-            CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
-            CriteriaQuery<E> cq = builder.createQuery(getEntityClass());
-            Root<E> root = cq.from(getEntityClass());
-            cq.select(root).where(builder.in(root.get(getIdProperty())).in(ids));
-            TypedQuery<E> query = getEntityManager().createQuery(cq);
-            return query.getResultList();
-        });
+        // The in-clause doesn't like empty collections.
+        if (ids.size() > 0) {
+            return getTransaction().exec((context) -> {
+                CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+                CriteriaQuery<E> cq = builder.createQuery(getEntityClass());
+                Root<E> root = cq.from(getEntityClass());
+                cq.select(root).where(builder.in(root.get(getIdProperty())).in(ids));
+                TypedQuery<E> query = getEntityManager().createQuery(cq);
+                return query.getResultList();
+            });
+        } else {
+            return Lists.newArrayList();
+        }
     }
 
 
