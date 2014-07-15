@@ -4,7 +4,7 @@
     <name>Pedal - The idiomatic JPA DAO framework.</name>
     <groupId>com.eclecticlogic</groupId>
     <artifactId>pedal</artifactId>
-    <version>1.3.11</version>
+    <version>1.3.12-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <description>Pedal is an idiomatic JPA and Spring based DAO framework.</description>
@@ -21,7 +21,7 @@
         <url>git@github.com:eclecticlogic/pedal.gt</url>
         <developerConnection>scm:git:git@github.com:eclecticlogic/pedal.git</developerConnection>
         <connection>scm:git:git@github.com:eclecticlogic/pedal.git</connection>
-        <tag>pedal-1.3.11</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
