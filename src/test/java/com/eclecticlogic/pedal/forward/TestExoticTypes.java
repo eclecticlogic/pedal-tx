@@ -21,6 +21,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -86,7 +87,7 @@ public class TestExoticTypes {
         ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
 
         ExoticTypes et = new ExoticTypes();
-        et.setLogin("test");
+        et.setLogin("testRead");
         et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(1L, 2L, 3L));
@@ -94,8 +95,8 @@ public class TestExoticTypes {
 
         dao.create(et);
 
-        ExoticTypes et1 = dao.findById("test").get();
-        assertEquals(et1.getLogin(), "test");
+        ExoticTypes et1 = dao.findById("testRead").get();
+        assertEquals(et1.getLogin(), "testRead");
         assertTrue(et1.getCountries().get(2));
         assertTrue(et1.getStatus() == Status.INACTIVE);
     }
@@ -104,15 +105,27 @@ public class TestExoticTypes {
     public void testQueryDSL() {
         ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
 
-        ExoticTypes et = new ExoticTypes();
-        et.setLogin("test");
-        et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
-        et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
-        et.setScores(Lists.newArrayList(1L, 2L, 3L));
-        et.setStatus(Status.ACTIVE);
-
         ExoticTypes t = dao.testWithQueryDSL();
         assertNotNull(t);
         assertTrue(t.getStatus() == Status.ACTIVE);
+    }
+    
+    
+    public void testArrayQuery() {
+        ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
+
+        ExoticTypes et = new ExoticTypes();
+        et.setLogin("testQuery");
+        et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
+        et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
+        et.setScores(Lists.newArrayList(3L, 7L, 21L));
+        et.setStatus(Status.INACTIVE);
+
+        dao.create(et);
+        
+        List<ExoticTypes> types = dao.queryArray(Lists.newArrayList(3L, 7L, 21L));
+        assertEquals(types.size(), 1);
+        System.out.println("**************");
+        System.out.println(types);
     }
 }

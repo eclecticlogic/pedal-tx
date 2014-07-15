@@ -191,6 +191,10 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 
 # Release notes
 
+## 1.3.11
+
+- Added ability to query custom type fields by supplying a custom binding.
+
 ## 1.3.10
 
 - Simplified vararg methods in DAO to make it easier to work with mock frameworks.

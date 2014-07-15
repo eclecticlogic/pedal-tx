@@ -27,6 +27,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dm.CustomBinding;
 import com.eclecticlogic.pedal.dm.Select;
 
 public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implements Select<E> {
@@ -67,6 +68,13 @@ public class SelectImpl<E extends Serializable> extends AbstractDDL<E> implement
     @Override
     public Select<E> bind(String param, Object value) {
         getBindings().add(new Binding(param, value));
+        return this;
+    }
+
+
+    @Override
+    public Select<E> bind(CustomBinding binding) {
+        getBindings().add(new Binding(binding));
         return this;
     }
 

@@ -23,6 +23,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dm.CustomBinding;
 import com.eclecticlogic.pedal.dm.Update;
 
 public class UpdateImpl<T extends Serializable> extends AbstractDDL<T> implements Update<T> {
@@ -42,6 +43,13 @@ public class UpdateImpl<T extends Serializable> extends AbstractDDL<T> implement
     @Override
     public Update<T> bind(String param, Object value) {
         getBindings().add(new Binding(param, value));
+        return this;
+    }
+
+
+    @Override
+    public Update<T> bind(CustomBinding binding) {
+        getBindings().add(new Binding(binding));
         return this;
     }
 

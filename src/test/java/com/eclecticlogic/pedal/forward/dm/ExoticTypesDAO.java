@@ -16,11 +16,15 @@
  */
 package com.eclecticlogic.pedal.forward.dm;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import org.hibernate.type.CustomType;
 import org.springframework.stereotype.Component;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayToListUserType;
 import com.eclecticlogic.pedal.test.dm.dao.TestDAO;
 import com.mysema.query.jpa.impl.JPAQuery;
 
@@ -50,5 +54,13 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
         return query.from(et) //
                 .where(et.status.eq(Status.ACTIVE)) //
                 .uniqueResult(et);
+    }
+
+
+    public List<ExoticTypes> queryArray(List<Long> scores) {
+        return select("from ExoticTypes where scores = :scores") //
+                .bind(query -> query.unwrap(org.hibernate.Query.class).setParameter("scores", scores,
+                        new CustomType(new PostgresqlArrayToListUserType.LONG()))) //
+                .list();
     }
 }

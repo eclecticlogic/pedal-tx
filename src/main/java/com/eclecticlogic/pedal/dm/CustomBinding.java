@@ -16,21 +16,15 @@
  */
 package com.eclecticlogic.pedal.dm;
 
-import java.io.Serializable;
-
-import javax.persistence.LockModeType;
+import javax.persistence.Query;
 
 /**
+ * Interface to perform binding of CustomTypes. 
  * @author kabram.
  *
  */
-@SuppressWarnings("rawtypes")
-public interface OperationQualification<E extends Serializable, Q extends OperationQualification> {
+@FunctionalInterface
+public interface CustomBinding {
 
-    public Q using(LockModeType lock);
-
-
-    public Q bind(String param, Object value);
-
-    public Q bind(CustomBinding binding);
+    public void bind(Query query);
 }

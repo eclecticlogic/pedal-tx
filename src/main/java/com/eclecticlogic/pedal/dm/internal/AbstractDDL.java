@@ -27,6 +27,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dm.CustomBinding;
 
 /**
  * @author kabram.
@@ -53,6 +54,7 @@ public class AbstractDDL<E extends Serializable> {
 
         private String name;
         private Object value;
+        private CustomBinding custom;
 
 
         public Binding(String name, Object value) {
@@ -62,8 +64,18 @@ public class AbstractDDL<E extends Serializable> {
         }
 
 
+        public Binding(CustomBinding custom) {
+            super();
+            this.custom = custom;
+        }
+
+
         public void bind(Query q) {
-            q.setParameter(name, value);
+            if (custom != null) {
+                custom.bind(q);
+            } else {
+                q.setParameter(name, value);
+            }
         }
 
     }
