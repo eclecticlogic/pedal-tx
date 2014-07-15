@@ -17,6 +17,7 @@
 package com.eclecticlogic.pedal.test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Collection;
@@ -65,6 +66,24 @@ public class CrudTest extends AbstractTest {
 
         assertEquals(dao.findById("test").isPresent(), true);
         assertEquals(dao.findById("test").get().getLocation(), "USA");
+    }
+
+
+    public void testFindById() {
+        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+        assertFalse(dao.findById("__notPresent").isPresent());
+    }
+
+
+    public void testFindByIds() {
+        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+        dao.findById(Lists.newArrayList("a", "b"));
+    }
+    
+    
+    public void testFindByEmptyIds() {
+        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
+        assertTrue(dao.findById(Lists.newArrayList()).isEmpty());
     }
 
 

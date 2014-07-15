@@ -216,7 +216,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
                 CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
                 CriteriaQuery<E> cq = builder.createQuery(getEntityClass());
                 Root<E> root = cq.from(getEntityClass());
-                cq.select(root).where(builder.in(root.get(getIdProperty())).in(ids));
+                cq.select(root).where(root.get(getIdProperty()).in(ids));
                 TypedQuery<E> query = getEntityManager().createQuery(cq);
                 return query.getResultList();
             });
