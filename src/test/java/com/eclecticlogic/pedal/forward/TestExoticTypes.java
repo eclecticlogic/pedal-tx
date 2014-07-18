@@ -34,6 +34,7 @@ import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypes;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypesDAO;
 import com.eclecticlogic.pedal.forward.dm.Status;
+import com.eclecticlogic.pedal.loader.Loader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -105,12 +106,12 @@ public class TestExoticTypes {
     public void testQueryDSL() {
         ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
 
-        ExoticTypes t = dao.testWithQueryDSL();
+        ExoticTypes t = dao.testWithQueryDSL().get(0);
         assertNotNull(t);
         assertTrue(t.getStatus() == Status.ACTIVE);
     }
-    
-    
+
+
     public void testArrayQuery() {
         ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
 
@@ -122,10 +123,16 @@ public class TestExoticTypes {
         et.setStatus(Status.INACTIVE);
 
         dao.create(et);
-        
+
         List<ExoticTypes> types = dao.queryArray(Lists.newArrayList(3L, 7L, 21L));
         assertEquals(types.size(), 1);
         System.out.println("**************");
         System.out.println(types);
+    }
+
+
+    public void testLoader() {
+        Loader loader = getContext().getBean(Loader.class);
+        loader.load("loader/test.loader.groovy");
     }
 }

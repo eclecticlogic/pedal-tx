@@ -48,12 +48,12 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
     }
 
 
-    public ExoticTypes testWithQueryDSL() {
+    public List<ExoticTypes> testWithQueryDSL() {
         JPAQuery query = new JPAQuery(getEntityManager());
         QExoticTypes et = QExoticTypes.exoticTypes;
         return query.from(et) //
                 .where(et.status.eq(Status.ACTIVE)) //
-                .uniqueResult(et);
+                .list(et);
     }
 
 
