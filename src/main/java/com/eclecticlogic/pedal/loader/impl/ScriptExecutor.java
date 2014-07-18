@@ -48,7 +48,6 @@ public class ScriptExecutor implements LoaderExecutor {
     private Stack<ScriptContext> scriptContextStack = new Stack<>();
 
     private Map<String, Object> inputs = new HashMap<>();
-    private Binding binding;
 
     private DAORegistry daoRegistry;
     private Transaction transaction;
@@ -79,28 +78,37 @@ public class ScriptExecutor implements LoaderExecutor {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> load(Collection<String> loadScripts) {
+        Binding binding = create();
+        // Bind inputs.
+        for (String key : inputs.keySet()) {
+            binding.setVariable(key, inputs.get(key));
+        }
+
         ResourceLoader loader = new DefaultResourceLoader();
-        Map<String, Object> retVal = new HashMap<>();
+
         for (String script : loadScripts) {
             try (InputStream stream = loader.getResource(script).getInputStream()) {
                 List<String> lines = IOUtils.readLines(stream);
                 String content = String.join("\n", lines);
 
-                retVal.putAll(transaction.exec(() -> execute(content)));
+                transaction.exec(() -> execute(content, binding));
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }
         }
-        return retVal;
+
+        return binding.getVariables();
     }
 
 
-    @SuppressWarnings({ "serial", "unchecked" })
-    public Map<String, Object> execute(String script) {
+    @SuppressWarnings("serial")
+    private Binding create() {
         Closure<List<Object>> table = new Closure<List<Object>>(this) {
 
+            @SuppressWarnings("unchecked")
             @Override
             public List<Object> call(Object... args) {
                 if (args == null || args.length != 3) {
@@ -119,14 +127,15 @@ public class ScriptExecutor implements LoaderExecutor {
             };
         };
 
-        binding = new Binding();
-        for (String key : inputs.keySet()) {
-            binding.setVariable(key, inputs.get(key));
-        }
-
+        Binding binding = new Binding();
         binding.setVariable("table", table);
         binding.setVariable("row", row);
+        return binding;
+    }
 
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> execute(String script, Binding binding) {
         GroovyShell shell = new GroovyShell(getClass().getClassLoader(), binding);
         shell.evaluate(script);
         return binding.getVariables();
