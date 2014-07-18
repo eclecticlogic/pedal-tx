@@ -19,6 +19,7 @@ package com.eclecticlogic.pedal.loader.impl;
 import java.util.Collection;
 import java.util.Map;
 
+import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.loader.Loader;
 import com.eclecticlogic.pedal.loader.LoaderExecutor;
@@ -32,6 +33,7 @@ import com.eclecticlogic.pedal.loader.LoaderExecutor;
 public class LoaderImpl implements Loader {
 
     private DAORegistry daoRegistry;
+    private Transaction transaction;
 
 
     public void setDaoRegistry(DAORegistry daoRegistry) {
@@ -39,9 +41,14 @@ public class LoaderImpl implements Loader {
     }
 
 
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
+
+
     @Override
     public LoaderExecutor withInputs(Map<String, Object> inputs) {
-        ScriptExecutor executor = new ScriptExecutor(daoRegistry);
+        ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
         executor.setInputs(inputs);
         return executor;
     }
@@ -49,14 +56,14 @@ public class LoaderImpl implements Loader {
 
     @Override
     public Map<String, Object> load(String loadScript, String... additionalScripts) {
-        ScriptExecutor executor = new ScriptExecutor(daoRegistry);
+        ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
         return executor.load(loadScript, additionalScripts);
     }
 
 
     @Override
     public Map<String, Object> load(Collection<String> loadScripts) {
-        ScriptExecutor executor = new ScriptExecutor(daoRegistry);
+        ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
         return executor.load(loadScripts);
     }
 }

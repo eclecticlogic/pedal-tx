@@ -1,34 +1,36 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="pedalSuite" parallel="tests" verbose="1">
-    <test name="basic">
-        <classes>
-            <class name="com.eclecticlogic.pedal.test.BasicTest" />
-        </classes>
-    </test>
+<!--     <test name="basic"> -->
+<!--         <classes> -->
+<!--             <class name="com.eclecticlogic.pedal.test.BasicTest" /> -->
+<!--         </classes> -->
+<!--     </test> -->
 
-    <test name="provider">
-        <classes>
-            <class name="com.eclecticlogic.pedal.provider.hibernate.HibernateProviderTest" />
-        </classes>
-    </test>
+<!--     <test name="provider"> -->
+<!--         <classes> -->
+<!--             <class name="com.eclecticlogic.pedal.provider.hibernate.HibernateProviderTest" /> -->
+<!--         </classes> -->
+<!--     </test> -->
 
-    <test name="crud">
-        <classes>
-            <class name="com.eclecticlogic.pedal.test.CrudTest" />
-        </classes>
-    </test>
-
+<!--     <test name="crud"> -->
+<!--         <classes> -->
+<!--             <class name="com.eclecticlogic.pedal.test.CrudTest" /> -->
+<!--         </classes> -->
+<!--     </test> -->
+    
+<!--     <test name="copy"> -->
+<!--         <classes> -->
+<!--             <class name="com.eclecticlogic.pedal.test.TestCopyCommand" /> -->
+<!--         </classes> -->
+<!--     </test> -->
+    
     <test name="forward">
         <classes>
             <class name="com.eclecticlogic.pedal.forward.TestExoticTypes" />
         </classes>
     </test>
 
-    <test name="copy">
-        <classes>
-            <class name="com.eclecticlogic.pedal.test.TestCopyCommand" />
-        </classes>
-    </test>
+
 
 </suite>

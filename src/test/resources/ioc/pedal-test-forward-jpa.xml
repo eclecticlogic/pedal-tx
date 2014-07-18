@@ -92,5 +92,6 @@
 
     <bean class="com.eclecticlogic.pedal.loader.impl.LoaderImpl">
         <property name="daoRegistry" ref="daoRegistry" />
+        <property name="transaction" ref="tx" />
     </bean>
 </beans>

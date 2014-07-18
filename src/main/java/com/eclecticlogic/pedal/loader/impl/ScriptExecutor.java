@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
+import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.loader.LoaderExecutor;
 import com.google.common.base.Throwables;
@@ -50,10 +51,12 @@ public class ScriptExecutor implements LoaderExecutor {
     private Binding binding;
 
     private DAORegistry daoRegistry;
+    private Transaction transaction;
 
 
-    public ScriptExecutor(DAORegistry daoRegistry) {
+    public ScriptExecutor(DAORegistry daoRegistry, Transaction transaction) {
         this.daoRegistry = daoRegistry;
+        this.transaction = transaction;
     }
 
 
@@ -85,7 +88,7 @@ public class ScriptExecutor implements LoaderExecutor {
                 List<String> lines = IOUtils.readLines(stream);
                 String content = String.join("\n", lines);
 
-                retVal.putAll(execute(content));
+                retVal.putAll(transaction.exec(() -> execute(content)));
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }
@@ -112,7 +115,7 @@ public class ScriptExecutor implements LoaderExecutor {
 
             @Override
             public Object call(Object... args) {
-                return invokeRowClosure((List<Object>) args[0]);
+                return invokeRowClosure(args);
             };
         };
 
@@ -144,12 +147,12 @@ public class ScriptExecutor implements LoaderExecutor {
     }
 
 
-    protected Object invokeRowClosure(List<Object> attributeValues) {
+    protected Object invokeRowClosure(Object... attributeValues) {
         Serializable instance = instantiate();
         DelegatingGroovyObjectSupport<Serializable> delegate = new DelegatingGroovyObjectSupport<Serializable>(instance);
 
         for (int i = 0; i < scriptContextStack.peek().getAttributes().size(); i++) {
-            delegate.setProperty(scriptContextStack.peek().getAttributes().get(i), attributeValues.get(i));
+            delegate.setProperty(scriptContextStack.peek().getAttributes().get(i), attributeValues[i]);
         }
         Object entity = daoRegistry.get(instance).create(instance);
         scriptContextStack.peek().getCreatedEntities().add(entity);
