@@ -3,6 +3,25 @@ Pedal
 
 A Java 8 based idiomatic JPA DAO framework. Let the examples say the rest.
 
+# Feature Highlights
+
+- Advanced transaction management
+	- Lambda based transaction boundary
+	- Transaction attached objects
+	- Transaction attached jobs
+- DAO shell with predefined functions
+    - Fluent interface for HQL/JQL queries
+    - Simple integration with QueryDSL	
+    - Hooks to set insert/update date/time automatically
+    - DAO registry function for dynamic CRUD operations
+- Postgresql specific features
+	- Support for COPY to insert data using collection of JPA entities
+	- Hibernate user-types for Postgres arrays
+	- Hibernate user-type for Postgres bit array  
+- Data loader support
+	- Simple groovy DSL for defining test data to be loaded
+	- Works at the JPA entity level (not database columns and values but JPA entity properties and "converted" types). 
+	 
 # Getting started
 
 Download the Pedal jar from Maven central:
@@ -10,7 +29,7 @@ Download the Pedal jar from Maven central:
 ```
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.3.13</version>
+	<version>1.4.0</version>
 ```
 
 Minimum dependencies that you need to provide in your application:
@@ -20,6 +39,7 @@ Minimum dependencies that you need to provide in your application:
 3. JTA v 1.1
 4. hibernate-core and hibernate-entitymanager 4.3 or higher.
 5. JDBC4 compliant driver and connection pool manager (BoneCP recommended).
+6. For data loader: groovy-all 2.3 or above
 
 # Configuration
 
@@ -37,13 +57,12 @@ Pedal DAO classes should derive from the AbstractDAO base class. It is recommend
 This is usually as simple as (for the Entity class Student.java; the code is necessitated by the limitations of generics in Java):
 
 ```
-public class StudentDAO extends AbstractDAO<Student> { 
-    @override
-    public Class<Student> getEntityClass() {
-    	return Student.class;
-    }
-    
-}
+	public class StudentDAO extends AbstractDAO<Student> { 
+    	@override
+	    public Class<Student> getEntityClass() {
+    		return Student.class;
+	    }
+	}
 ```
 
 The DAO should also be provided with a reference to an EntityManager. This can be done as part of Spring wiring or in code as:
@@ -189,38 +208,92 @@ Transaction attached jobs allow you to fire code either just before and just aft
 
 Pedal currently implements support for Hibernate and allows access to the ProviderAccess interface from within the DAOs. This interface provides access to the current schema name and the table name (including overridden names in orm.xml) for entities.
 
+# Data Loader
+
+The pedal data loader is accessed via the Loader interface. Create an instance of LoaderImpl providing it with a reference to the dao registry. Create your load script in one or more groovy scripts in your classpath.
+
+The Loader interface allows you to specify inputs to the script. The inputs are in the form of a map of objects to String keys. The keys will be available as variables in your script.
+
+Call teh load method passing in one or more scripts to load and execute. Any inputs defined are passed to all the scripts.
+
+## Loader script format
+
+The loader works using a typical groovy script with a special syntax for defining tables to load. The script can contain import statements, variable definitions, etc. Any properties defined in the script (essentially a variable without a def) will be available in the map returned by the Loader.load() method. This can be used to get specific objects or ids to test against.
+
+### Table load definition
+
+To insert rows into a table, use the table() method. The method takes two parameters and a closure:
+
+Class reference of JPA entity
+List of attributes you want to define.
+
+The method returns a list of entities created in the closure.
+
+The closure should have one more more lines of the format:
+
+row << [<value1>, <value2>, ...]
+
+The values are what you'd populate in the JPA entity, not in the database. So for a foreign key, you'd pass the @JoinColumn object. For a character field mapped to an Enum, you'd pass the actual Enum
+
+Here is an example of a simple script to populate a table and then a child table:
+
+```
+	import com.test.School
+    import com.test.Student
+	import com.test.SchoolType
+    import com.test.Gender
+
+	table(School, [name, type, address]) {
+		row 'Lee Elementary', SchoolType.ELEMENTARY, '1 Lee Rd'
+		row 'Park View School', SchoolType.MIDDLE, '10 Elm Street'
+		highSchool = row 'Mountain Top High', SchoolType.HIGH, '12 Dream Street'
+	} 
+
+	println highSchool.id
+
+    table(Student, [name, gender, school]) {
+		row 'Joe Schmuckately', Gender.MALE, highSchool
+    }
+```   
+
+The above script creates three rows in the school table and also prints the database assigned id of the highSchool. The highSchool object can now be accessed from the map of variables returned by the load() method using the key "highSchool".  
+
 # Release notes
 
-## 1.3.11
+### 1.4.0
+
+- Added DSL for easy loading of test data
+
+### 1.3.11
 
 - Added ability to query custom type fields by supplying a custom binding.
 
-## 1.3.10
+### 1.3.10
 
 - Simplified vararg methods in DAO to make it easier to work with mock frameworks.
 
-## 1.3.9
+### 1.3.9
 
 - Introduced Javassist based copy-command data extractor.
 
-## 1.3.6
+### 1.3.6
 
 - Modified copy-command support to build copy string automatically.
 
-## 1.3.5
+### 1.3.5
 
 - Bug fixes
 - Support for postgresql copy command
 
-## 1.3.0
+### 1.3.0
 
 - Added DateTimeAwareDAO to facilitate automatic setting of inserted-on, updated-on type fields. DAOs of entities that want automatic inserted-on/updated-on values populated in create()/update() methods should implement this interface. Methods of the interface may be overridden as necessary. TemporalType.TIMESTAMP and DATE are supported. See the ManufacturerDAO and EmployeeDAO test classes for a simple example.
 
-## 1.2.1
+### 1.2.1
 
 - Modified lock api to work with entity or id. 
 
-## 1.2.0
+### 1.2.0
 
 - Added support for PostgreSQL bit strings (PostgresqlBitStringUserType).
 - Added tests of array (mapping to list and set) and bit string types.
