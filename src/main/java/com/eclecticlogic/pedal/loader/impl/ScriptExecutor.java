@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -36,7 +37,6 @@ import org.springframework.core.io.ResourceLoader;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.loader.LoaderExecutor;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 
 /**
  * @author kabram.
@@ -44,8 +44,7 @@ import com.google.common.collect.Lists;
  */
 public class ScriptExecutor implements LoaderExecutor {
 
-    private Class<?> currentClass;
-    private List<String> attributes;
+    private Stack<ScriptContext> scriptContextStack = new Stack<>();
 
     private Map<String, Object> inputs = new HashMap<>();
     private Binding binding;
@@ -127,16 +126,21 @@ public class ScriptExecutor implements LoaderExecutor {
 
         GroovyShell shell = new GroovyShell(getClass().getClassLoader(), binding);
         shell.evaluate(script);
-        System.out.println("Bindings = " + binding.getVariables());
         return binding.getVariables();
     }
 
 
     protected <V> List<Object> invokeWithClosure(Class<?> clz, List<String> attributes, Closure<V> callable) {
-        currentClass = clz;
-        this.attributes = attributes;
+        ScriptContext context = new ScriptContext();
+        context.setEntityClass(clz);
+        context.setAttributes(attributes);
+
+        scriptContextStack.push(context);
+
         callable.call();
-        return Lists.newArrayList("apple", "banana");
+
+        scriptContextStack.pop();
+        return context.getCreatedEntities();
     }
 
 
@@ -144,16 +148,18 @@ public class ScriptExecutor implements LoaderExecutor {
         Serializable instance = instantiate();
         DelegatingGroovyObjectSupport<Serializable> delegate = new DelegatingGroovyObjectSupport<Serializable>(instance);
 
-        for (int i = 0; i < attributes.size(); i++) {
-            delegate.setProperty(attributes.get(i), attributeValues.get(i));
+        for (int i = 0; i < scriptContextStack.peek().getAttributes().size(); i++) {
+            delegate.setProperty(scriptContextStack.peek().getAttributes().get(i), attributeValues.get(i));
         }
-        return daoRegistry.get(instance).create(instance);
+        Object entity = daoRegistry.get(instance).create(instance);
+        scriptContextStack.peek().getCreatedEntities().add(entity);
+        return entity;
     }
 
 
     private Serializable instantiate() {
         try {
-            return (Serializable) currentClass.newInstance();
+            return (Serializable) scriptContextStack.peek().getEntityClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw Throwables.propagate(e);
         }

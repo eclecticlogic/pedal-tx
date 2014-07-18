@@ -211,7 +211,7 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     @Override
     public List<E> findById(final Collection<? extends P> ids) {
         // The in-clause doesn't like empty collections.
-        if (ids.size() > 0) {
+        if (!ids.isEmpty()) {
             return getTransaction().exec((context) -> {
                 CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
                 CriteriaQuery<E> cq = builder.createQuery(getEntityClass());

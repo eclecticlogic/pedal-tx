@@ -126,8 +126,6 @@ public class TestExoticTypes {
 
         List<ExoticTypes> types = dao.queryArray(Lists.newArrayList(3L, 7L, 21L));
         assertEquals(types.size(), 1);
-        System.out.println("**************");
-        System.out.println(types);
     }
 
 

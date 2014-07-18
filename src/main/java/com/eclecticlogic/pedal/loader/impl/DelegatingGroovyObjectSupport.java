@@ -22,6 +22,9 @@ import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
 
 /**
+ * Allows groovy style property setting for any regular java object including automatic type conversions that groovy
+ * performs.
+ * 
  * @author kabram.
  *
  */
