@@ -28,14 +28,30 @@ public interface LoaderExecutor {
     /**
      * @param loadScript Script to load.
      * @param additionalScripts Other scripts to load.
-     * @return Fluent interface that allows you to define inputs and then load the scripts.
+     * @return Output variables from the script.
      */
     public Map<String, Object> load(String loadScript, String... additionalScripts);
 
 
     /**
+     * Namespace 
+     * @param script Script with namespace to load.
+     * @param additionalScripts Other scripts to load.
+     * @return Output variables from the script.
+     */
+    public Map<String, Object> load(Script script, Script... additionalScripts);
+
+
+    /**
      * @param loadScripts Collection of scripts to load.
-     * @return Fluent interface that allows you to define inputs and then load the scripts.
+     * @return Output variables from the script.
      */
     public Map<String, Object> load(Collection<String> loadScripts);
+
+
+    /**
+     * @param loadScripts Scripts with namespaces.
+     * @return Output variables from the script.
+     */
+    public Map<String, Object> loadNamespaced(Collection<Script> loadScripts);
 }

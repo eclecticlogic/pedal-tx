@@ -14,28 +14,39 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.loader;
+package com.eclecticlogic.pedal.loader.impl;
 
+import groovy.lang.Binding;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Data loader utility.
  * @author kabram.
  *
  */
-public interface Loader extends LoaderExecutor {
+public class NamespacedBinding extends Binding {
 
-    /**
-     * @param directory Base directory for scripts
-     * @return Fluent interface for continued loading.
-     */
-    public Loader withScriptDirectory(String directory);
+    private boolean capture;
+    private Map<String, Object> namespacedVariables = new HashMap<>();
 
 
-    /**
-     * @param inputs Objects that can be referenced (by their keys) in the load script.
-     * @return fluent interface to continue loading.
-     */
-    public LoaderExecutor withInputs(Map<String, Object> inputs);
+    public void startCapture() {
+        capture = true;
+    }
+
+
+    @Override
+    public void setVariable(String name, Object value) {
+        if (capture) {
+            namespacedVariables.put(name, value);
+        }
+        super.setVariable(name, value);
+    }
+
+
+    public Map<String, Object> getNamespacedVariables() {
+        return namespacedVariables;
+    }
 
 }

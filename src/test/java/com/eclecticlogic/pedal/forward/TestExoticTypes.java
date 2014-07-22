@@ -22,6 +22,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -33,8 +34,10 @@ import org.testng.xml.XmlTest;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypes;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypesDAO;
+import com.eclecticlogic.pedal.forward.dm.SimpleType;
 import com.eclecticlogic.pedal.forward.dm.Status;
 import com.eclecticlogic.pedal.loader.Loader;
+import com.eclecticlogic.pedal.loader.Script;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -129,8 +132,26 @@ public class TestExoticTypes {
     }
 
 
-    public void testLoader() {
+    @SuppressWarnings("unchecked")
+    public void testLoaderWithNamespaces() {
         Loader loader = getContext().getBean(Loader.class);
-        loader.load("loader/test.loader.groovy");
+        Map<String, Object> variables = loader //
+                .withScriptDirectory("loader") //
+                .load(Script.with("simple.loader.groovy", "a"), Script.with("simple.loader.groovy", "b"));
+        Map<String, Object> avars = (Map<String, Object>) variables.get("a");
+        assertEquals(((SimpleType) avars.get("simple1")).getAmount(), 10);
+        Map<String, Object> bvars = (Map<String, Object>) variables.get("b");
+        assertEquals(((SimpleType) bvars.get("simple2")).getAmount(), 20);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public void testLoadWithinLoadScript() {
+        Loader loader = getContext().getBean(Loader.class);
+        Map<String, Object> variables = loader.withScriptDirectory("loader") //
+                .load("test.loader.groovy");
+        Map<String, Object> output = (Map<String, Object>) variables.get("output");
+        Map<String, Object> avars = (Map<String, Object>) output.get("a");
+        assertEquals(((SimpleType) avars.get("simple1")).getAmount(), 10);
     }
 }

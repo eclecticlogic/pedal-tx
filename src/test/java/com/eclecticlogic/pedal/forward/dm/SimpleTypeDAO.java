@@ -14,28 +14,32 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.loader;
+package com.eclecticlogic.pedal.forward.dm;
 
-import java.util.Map;
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Component;
+
+import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.test.dm.dao.TestDAO;
 
 /**
- * Data loader utility.
  * @author kabram.
  *
  */
-public interface Loader extends LoaderExecutor {
+@Component
+public class SimpleTypeDAO extends TestDAO<SimpleType, Integer> {
 
-    /**
-     * @param directory Base directory for scripts
-     * @return Fluent interface for continued loading.
-     */
-    public Loader withScriptDirectory(String directory);
+    @Override
+    @Inject
+    public void setTransaction(Transaction transaction) {
+        super.setTransaction(transaction);
+    }
 
 
-    /**
-     * @param inputs Objects that can be referenced (by their keys) in the load script.
-     * @return fluent interface to continue loading.
-     */
-    public LoaderExecutor withInputs(Map<String, Object> inputs);
+    @Override
+    public Class<SimpleType> getEntityClass() {
+        return SimpleType.class;
+    }
 
 }

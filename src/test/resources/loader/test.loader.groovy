@@ -2,6 +2,7 @@ import com.eclecticlogic.pedal.forward.dm.ExoticTypes
 import com.eclecticlogic.pedal.forward.dm.Status;
 import com.eclecticlogic.pedal.forward.dm.Widget;
 
+output = load('a': 'simple.loader.groovy', 'b': 'simple.loader.groovy')
 
 def name = 'pedal'
 

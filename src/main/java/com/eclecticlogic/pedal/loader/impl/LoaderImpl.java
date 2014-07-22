@@ -23,6 +23,7 @@ import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.loader.Loader;
 import com.eclecticlogic.pedal.loader.LoaderExecutor;
+import com.eclecticlogic.pedal.loader.Script;
 
 /**
  * Data loader entry class.
@@ -32,6 +33,7 @@ import com.eclecticlogic.pedal.loader.LoaderExecutor;
  */
 public class LoaderImpl implements Loader {
 
+    private String scriptDirectory;
     private DAORegistry daoRegistry;
     private Transaction transaction;
 
@@ -47,8 +49,22 @@ public class LoaderImpl implements Loader {
 
 
     @Override
-    public LoaderExecutor withInputs(Map<String, Object> inputs) {
+    public Loader withScriptDirectory(String directory) {
+        scriptDirectory = directory;
+        return this;
+    }
+
+
+    private ScriptExecutor createScriptExecutor() {
         ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
+        executor.setScriptDirectory(scriptDirectory);
+        return executor;
+    }
+
+
+    @Override
+    public LoaderExecutor withInputs(Map<String, Object> inputs) {
+        ScriptExecutor executor = createScriptExecutor();
         executor.setInputs(inputs);
         return executor;
     }
@@ -56,14 +72,24 @@ public class LoaderImpl implements Loader {
 
     @Override
     public Map<String, Object> load(String loadScript, String... additionalScripts) {
-        ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
-        return executor.load(loadScript, additionalScripts);
+        return createScriptExecutor().load(loadScript, additionalScripts);
+    }
+
+
+    @Override
+    public Map<String, Object> load(Script script, Script... additionalScripts) {
+        return createScriptExecutor().load(script, additionalScripts);
     }
 
 
     @Override
     public Map<String, Object> load(Collection<String> loadScripts) {
-        ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
-        return executor.load(loadScripts);
+        return createScriptExecutor().load(loadScripts);
+    }
+
+
+    @Override
+    public Map<String, Object> loadNamespaced(Collection<Script> loadScripts) {
+        return createScriptExecutor().loadNamespaced(loadScripts);
     }
 }

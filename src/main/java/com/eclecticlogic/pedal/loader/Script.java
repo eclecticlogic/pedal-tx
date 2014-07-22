@@ -16,26 +16,42 @@
  */
 package com.eclecticlogic.pedal.loader;
 
-import java.util.Map;
-
 /**
- * Data loader utility.
+ * Defines a namespaced script.
  * @author kabram.
  *
  */
-public interface Loader extends LoaderExecutor {
+public class Script {
 
-    /**
-     * @param directory Base directory for scripts
-     * @return Fluent interface for continued loading.
-     */
-    public Loader withScriptDirectory(String directory);
+    private String name;
+    private String namespace;
 
 
     /**
-     * @param inputs Objects that can be referenced (by their keys) in the load script.
-     * @return fluent interface to continue loading.
+     * @param name Name of the script to load.
+     * @param namespace Namespace of the script to load.
+     * @return Script instance.
      */
-    public LoaderExecutor withInputs(Map<String, Object> inputs);
+    public static Script with(String name, String namespace) {
+        Script script = new Script();
+        script.name = name;
+        script.namespace = namespace;
+        return script;
+    }
+
+
+    public static Script script(String name) {
+        return with(name, null);
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public String getNamespace() {
+        return namespace;
+    }
 
 }

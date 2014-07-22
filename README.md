@@ -213,8 +213,9 @@ Pedal currently implements support for Hibernate and allows access to the Provid
 The pedal data loader is accessed via the Loader interface. Create an instance of LoaderImpl providing it with a reference to the dao registry. Create your load script in one or more groovy scripts in your classpath.
 
 The Loader interface allows you to specify inputs to the script. The inputs are in the form of a map of objects to String keys. The keys will be available as variables in your script.
+The loader also allows you to specify a directory (in the classpath) where all your scripts reside. All references to scripts can then be relative to that directory.
 
-Call teh load method passing in one or more scripts to load and execute. Any inputs defined are passed to all the scripts.
+Call the load method passing in one or more scripts to load and execute. Any inputs defined are passed to all the scripts. The loader also allows you to define namespaces so that output variables from scripts are separate. A variable called x created by a script with a namespace of a can be accessed in subsequent scripts as a.x. In the returned Map, the key "a" has a map of variables, one of which is x. 
 
 ## Loader script format
 
@@ -268,6 +269,8 @@ Variables created in one script are available to the next script when multiple s
 
 - Variables created in one load script are available to the next.
 - Find method for load script. 
+- Namespaced variables in load scripts.
+- load method for use within scripts to load other scripts.
 
 ### 1.4.0
 

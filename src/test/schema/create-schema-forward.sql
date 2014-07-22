@@ -20,11 +20,19 @@ WITH (OIDS=FALSE)
 ;
 
 
-ALTER TABLE "exotic_types" ADD CONSTRAINT "Key1" PRIMARY KEY ("login")
+CREATE TABLE "simple_type"(
+ "id" Serial NOT NULL,
+ "amount" integer NOT NULL
+)
+WITH (OIDS=FALSE)
 ;
 
 
+ALTER TABLE "exotic_types" ADD CONSTRAINT "Key1" PRIMARY KEY ("login")
+;
 ALTER TABLE "widget" ADD CONSTRAINT "Key2" PRIMARY KEY ("id")
+;
+ALTER TABLE "simple_type" ADD CONSTRAINT "Key3" PRIMARY KEY ("id")
 ;
 
 ALTER TABLE "widget" ADD CONSTRAINT "Relationship1" FOREIGN KEY ("login_type") REFERENCES "exotic_types" ("login") ON DELETE NO ACTION ON UPDATE NO ACTION
