@@ -127,9 +127,19 @@ public class ScriptExecutor implements LoaderExecutor {
             };
         };
 
+        Closure<Object> find = new Closure<Object>(this) {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public Object call(Object... args) {
+                return invokeFindClosure((Class<? extends Serializable>) args[0], (Serializable) args[1]);
+            };
+        };
+
         Binding binding = new Binding();
         binding.setVariable("table", table);
         binding.setVariable("row", row);
+        binding.setVariable("find", find);
         return binding;
     }
 
@@ -142,7 +152,7 @@ public class ScriptExecutor implements LoaderExecutor {
     }
 
 
-    protected <V> List<Object> invokeWithClosure(Class<?> clz, List<String> attributes, Closure<V> callable) {
+    private <V> List<Object> invokeWithClosure(Class<?> clz, List<String> attributes, Closure<V> callable) {
         ScriptContext context = new ScriptContext();
         context.setEntityClass(clz);
         context.setAttributes(attributes);
@@ -156,7 +166,7 @@ public class ScriptExecutor implements LoaderExecutor {
     }
 
 
-    protected Object invokeRowClosure(Object... attributeValues) {
+    private Object invokeRowClosure(Object... attributeValues) {
         Serializable instance = instantiate();
         DelegatingGroovyObjectSupport<Serializable> delegate = new DelegatingGroovyObjectSupport<Serializable>(instance);
 
@@ -166,6 +176,11 @@ public class ScriptExecutor implements LoaderExecutor {
         Object entity = daoRegistry.get(instance).create(instance);
         scriptContextStack.peek().getCreatedEntities().add(entity);
         return entity;
+    }
+
+
+    private Object invokeFindClosure(Class<? extends Serializable> clz, Serializable id) {
+        return daoRegistry.get(clz).findById(id).orElse(null);
     }
 
 

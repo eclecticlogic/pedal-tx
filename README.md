@@ -29,7 +29,7 @@ Download the Pedal jar from Maven central:
 ```
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.4.0</version>
+	<version>1.4.1</version>
 ```
 
 Minimum dependencies that you need to provide in your application:
@@ -254,15 +254,24 @@ Here is an example of a simple script to populate a table and then a child table
     table(Student, [name, gender, school]) {
 		row 'Joe Schmuckately', Gender.MALE, highSchool
     }
+
+	find(Student, 1)
 ```   
 
 The above script creates three rows in the school table and also prints the database assigned id of the highSchool. The highSchool object can now be accessed from the map of variables returned by the load() method using the key "highSchool".  
 
+Variables created in one script are available to the next script when multiple scripts are passed to the same load() call. The find method can be used to retrieve data that has been created by primary key.
+
 # Release notes
+
+### 1.4.1 
+
+- Variables created in one load script are available to the next.
+- Find method for load script. 
 
 ### 1.4.0
 
-- Added DSL for easy loading of test data
+- Added DSL for easy loading of test data.
 
 ### 1.3.11
 
@@ -282,8 +291,8 @@ The above script creates three rows in the school table and also prints the data
 
 ### 1.3.5
 
-- Bug fixes
-- Support for postgresql copy command
+- Bug fixes.
+- Support for postgresql copy command.
 
 ### 1.3.0
 

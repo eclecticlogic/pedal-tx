@@ -224,7 +224,7 @@
                     <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>9.3-1101-jdbc41</version>
+                        <version>${version.postgresql.jdbc}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -311,14 +311,14 @@
         <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>3.4.0</version>
+            <version>3.4.1</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901-1.jdbc4</version>
+            <version>${version.postgresql.jdbc}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -384,8 +384,9 @@
     </dependencies>
 
     <properties>
-        <version.hibernate>4.3.5.Final</version.hibernate>
-        <version.spring>4.0.5.RELEASE</version.spring>
+        <version.hibernate>4.3.6.Final</version.hibernate>
+        <version.spring>4.0.6.RELEASE</version.spring>
         <version.slf4j>1.7.7</version.slf4j>
+        <version.postgresql.jdbc>9.3-1102-jdbc41</version.postgresql.jdbc>
     </properties>
 </project>

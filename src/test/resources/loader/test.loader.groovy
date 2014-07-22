@@ -17,5 +17,7 @@ def i = 0;
     }
     
     println widget.id
+    
+    foundWidget = find(Widget, 1)
 }
 
