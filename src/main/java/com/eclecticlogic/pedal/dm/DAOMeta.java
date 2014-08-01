@@ -29,9 +29,9 @@ import javax.persistence.metamodel.EntityType;
  */
 public interface DAOMeta<E extends Serializable, P extends Serializable> {
 
-    public Class<E> getEntityClass();
+    Class<E> getEntityClass();
 
 
-    public EntityType<E> getEntityType();
+    EntityType<E> getEntityType();
 
 }

@@ -16,15 +16,22 @@
  */
 package com.eclecticlogic.pedal.dm;
 
-import javax.persistence.Query;
+import java.io.Serializable;
+import java.util.Optional;
 
 /**
- * Interface to perform binding of CustomTypes. 
+ * When performing simple operations against single entities, using a DAOLite instance is easier than getting references
+ * to specific DAO instances. This supports single entity create, find by Id, update and delete operations. 
+ * 
  * @author kabram.
  *
  */
-@FunctionalInterface
-public interface CustomBinding {
+public interface DAOLite<E extends Serializable, P extends Serializable> extends DAOSingular<E> {
 
-    void bind(Query query);
+    /**
+     * @param clz Entity class type.
+     * @param id Primary key
+     * @return Entity instance in an optional container.
+     */
+    Optional<E> findById(Class<E> clz, P id);
 }

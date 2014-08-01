@@ -21,11 +21,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -37,37 +36,37 @@ import org.hibernate.engine.spi.SessionImplementor;
  * @author kabram.
  *
  */
-public abstract class ArrayToListUserType<T> extends AbstractMutableUserType {
+public class SetType extends ArrayType {
 
-    protected abstract String getDialectPrimitiveName();
+    public SetType() {
+        super();
+    }
 
 
-    @Override
-    public int[] sqlTypes() {
-        return new int[] { Types.ARRAY };
+    public SetType(String dialectPrimitiveName) {
+        super(dialectPrimitiveName);
     }
 
 
     @Override
     public Class<?> returnedClass() {
-        return List.class;
+        return Set.class;
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
             throws HibernateException, SQLException {
         Array sqlArray = rs.getArray(names[0]);
 
         if (rs.wasNull()) {
-            return Collections.EMPTY_LIST;
+            return Collections.EMPTY_SET;
         } else {
-            List<T> list = new ArrayList<>();
+            Set<Object> set = new HashSet<>();
             for (Object element : (Object[]) sqlArray.getArray()) {
-                list.add((T) element);
+                set.add((Object) element);
             }
-            return list;
+            return set;
         }
     }
 
@@ -77,19 +76,18 @@ public abstract class ArrayToListUserType<T> extends AbstractMutableUserType {
     public void nullSafeSet(final PreparedStatement statement, final Object object, final int i,
             SessionImplementor session) throws HibernateException, SQLException {
         Connection connection = session.connection();
-        List<T> list = (List<T>) object;
-        Object[] elements = list == null ? new Object[] {} : list.toArray();
-        Array array = connection.createArrayOf(getDialectPrimitiveName(), elements);
-        statement.setArray(i, array);
+        Set<Object> set = (Set<Object>) object;
+        Object[] array = set == null ? new Object[] {} : set.toArray();
+        setArrayValue(statement, i, connection, array);
     }
 
 
     @Override
     public Object deepCopy(Object value) throws HibernateException {
         if (value == null) {
-            return new ArrayList<>();
+            return new HashSet<>();
         } else {
-            return new ArrayList<>((Collection<?>) value);
+            return new HashSet<>((Collection<?>) value);
         }
     }
 

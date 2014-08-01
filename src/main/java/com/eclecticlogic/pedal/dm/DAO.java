@@ -29,49 +29,28 @@ import javax.persistence.LockModeType;
  * @param <E> The Entity type.
  * @param <P> The type of the primary key.
  */
-public interface DAO<E extends Serializable, P extends Serializable> extends DAOMeta<E, P> {
-
-    /**
-     * @param entity Entity to create (persist) in the database.
-     * @return
-     */
-    public E create(E entity);
-
+public interface DAO<E extends Serializable, P extends Serializable> extends DAOMeta<E, P>, DAOSingular<E> {
 
     /**
      * @param entities Collection of entities
      * @return List of entities that were created.
      */
-    public List<? extends E> create(Collection<? extends E> entities);
+    List<? extends E> create(Collection<? extends E> entities);
 
 
-    public Optional<E> findById(P id);
+    Optional<E> findById(P id);
 
 
-    public List<E> findById(Collection<? extends P> ids);
+    List<E> findById(Collection<? extends P> ids);
 
 
-    public List<E> findAll();
+    List<E> findAll();
 
 
-    public E update(E entity);
+    List<E> update(Collection<? extends E> entities);
 
 
-    public List<E> update(Collection<? extends E> entities);
-
-
-    public E delete(E entity);
-
-
-    public List<E> delete(Collection<? extends E> entities);
-
-
-    /**
-     * @param entity Entity to lock
-     * @param lockMode Locking mode
-     * @return Locked entity refreshed to reflect state after locking.
-     */
-    public E lock(E entity, LockModeType lockMode);
+    List<E> delete(Collection<? extends E> entities);
 
 
     /**
@@ -79,6 +58,6 @@ public interface DAO<E extends Serializable, P extends Serializable> extends DAO
      * @param lockMode Locking mode
      * @return Locked entity.
      */
-    public E lockById(P id, LockModeType lockMode);
+    E lockById(P id, LockModeType lockMode);
 
 }

@@ -27,10 +27,11 @@ import javax.persistence.LockModeType;
 @SuppressWarnings("rawtypes")
 public interface OperationQualification<E extends Serializable, Q extends OperationQualification> {
 
-    public Q using(LockModeType lock);
+    Q using(LockModeType lock);
 
 
-    public Q bind(String param, Object value);
+    Q bind(String param, Object value);
 
-    public Q bind(CustomBinding binding);
+
+    Q bind(CustomBinding binding);
 }

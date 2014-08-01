@@ -19,8 +19,10 @@ package com.eclecticlogic.pedal.dm.internal;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +34,15 @@ import com.eclecticlogic.pedal.dm.DAO;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.dm.TestableDAO;
 
-public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
+public class DAORegistryImpl<E extends Serializable, P extends Serializable> implements DAORegistry<E, P>,
+        BeanPostProcessor {
 
     private Transaction transaction;
     private EntityManagerFactory entityManagerFactory;
     private Map<Class<?>, DAO<? extends Serializable, ? extends Serializable>> daosByEntityClass = new HashMap<>();
 
     private static Logger logger = LoggerFactory.getLogger(DAORegistryImpl.class);
+
 
     protected Transaction getTransaction() {
         return transaction;
@@ -78,23 +82,23 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E extends Serializable, P extends Serializable> DAO<E, P> get(Class<E> clz) {
+    public DAO<E, P> get(Class<E> clz) {
         return (DAO<E, P>) daosByEntityClass.get(clz);
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E extends Serializable, P extends Serializable> DAO<E, P> get(E entity) {
+    public DAO<E, P> get(E entity) {
         return (DAO<E, P>) daosByEntityClass.get(getEntityClass(entity));
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E extends Serializable, P extends Serializable> void testDAOs() {
+    public void testDAOs() {
         for (DAO<? extends Serializable, ? extends Serializable> udao : daosByEntityClass.values()) {
-            DAO<E, P> dao = getGenericizedDAO(udao);
+            DAO<E, P> dao = (DAO<E, P>) udao;
             if (dao instanceof TestableDAO) {
                 logger.debug("Testing DAO " + dao.getClass().getName());
                 P pk = ((TestableDAO<P>) dao).getPrototypicalPrimaryKey();
@@ -102,18 +106,6 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
                 dao.findById(pk);
             }
         }
-    }
-
-
-    /**
-     * This is to work around java generics coercion.
-     * @param dao
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private <E extends Serializable, P extends Serializable> DAO<E, P> getGenericizedDAO(
-            DAO<? extends Serializable, ? extends Serializable> dao) {
-        return (DAO<E, P>) dao;
     }
 
 
@@ -130,5 +122,37 @@ public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
         }
 
         return clz;
+    }
+
+
+    // DAOLite methods.
+
+    @Override
+    public Optional<E> findById(Class<E> clz, P id) {
+        return get(clz).findById(id);
+    }
+
+
+    @Override
+    public E create(E entity) {
+        return get(entity).create(entity);
+    }
+
+
+    @Override
+    public E update(E entity) {
+        return get(entity).update(entity);
+    }
+
+
+    @Override
+    public E delete(E entity) {
+        return get(entity).delete(entity);
+    }
+
+
+    @Override
+    public E lock(E entity, LockModeType lockMode) {
+        return get(entity).lock(entity, lockMode);
     }
 }

@@ -17,18 +17,36 @@
 package com.eclecticlogic.pedal.provider.hibernate;
 
 import java.util.Objects;
+import java.util.Properties;
 
 import org.hibernate.HibernateException;
+import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
 /**
  * Adapted from https://forum.hibernate.org/viewtopic.php?t=946973 and 
  * http://blog.xebia.com/2009/11/09/understanding-and-writing-hibernate-user-types/
  * 
+ * Includes support for parameterized types.
+ * 
  * @author kabram.
  *
  */
-public abstract class AbstractUserType implements UserType {
+public abstract class AbstractUserType implements UserType, ParameterizedType {
+
+    private Properties parameters;
+
+
+    public Properties getParameters() {
+        return parameters;
+    }
+
+
+    @Override
+    public void setParameterValues(Properties parameters) {
+        this.parameters = parameters;
+    }
+
 
     @Override
     public boolean equals(Object x, Object y) throws HibernateException {

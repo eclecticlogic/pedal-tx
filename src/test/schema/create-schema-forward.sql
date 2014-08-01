@@ -5,7 +5,8 @@ CREATE TABLE "exotic_types"(
  "login" Varchar NOT NULL,
  "countries" Bit(7) NOT NULL,
  "authorizations" Character varying(20)[] NOT NULL,
- "scores" Bigint[] NOT NULL,
+ "scores" Bigint[] NULL,
+ "gpa" Bigint[] NULL,
  "status" Character(2) NOT NULL
 )
 WITH (OIDS=FALSE)

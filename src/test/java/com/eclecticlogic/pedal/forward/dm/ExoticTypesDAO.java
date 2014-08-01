@@ -24,7 +24,8 @@ import org.hibernate.type.CustomType;
 import org.springframework.stereotype.Component;
 
 import com.eclecticlogic.pedal.Transaction;
-import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayToListUserType;
+import com.eclecticlogic.pedal.provider.hibernate.ListType;
+import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayPrimitiveName;
 import com.eclecticlogic.pedal.test.dm.dao.TestDAO;
 import com.mysema.query.jpa.impl.JPAQuery;
 
@@ -60,7 +61,12 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
     public List<ExoticTypes> queryArray(List<Long> scores) {
         return select("from ExoticTypes where scores = :scores") //
                 .bind(query -> query.unwrap(org.hibernate.Query.class).setParameter("scores", scores,
-                        new CustomType(new PostgresqlArrayToListUserType.LONG()))) //
+                        new CustomType(new ListType(PostgresqlArrayPrimitiveName.LONG)))) //
                 .list();
+    }
+
+
+    public List<ExoticTypes> getNullScores() {
+        return select("from ExoticTypes where scores is null").list();
     }
 }

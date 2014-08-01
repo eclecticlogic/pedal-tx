@@ -25,5 +25,9 @@ import java.io.Serializable;
  */
 public interface Update<E extends Serializable> extends OperationQualification<E, Update<E>> {
 
-    public int update();
+    /**
+     * Executes the update statement.
+     * @return Number of rows returned.
+     */
+    int update();
 }

@@ -18,7 +18,6 @@ package com.eclecticlogic.pedal.dm;
 
 import java.io.Serializable;
 
-
 /**
  * @author kabram.
  * @param <P> Primary key of the entity that this DAO manages.
@@ -28,5 +27,5 @@ public interface TestableDAO<P extends Serializable> {
     /**
      * @return A sample primary key that is used to execute a find by pk query for basic testing.
      */
-    public P getPrototypicalPrimaryKey();
+    P getPrototypicalPrimaryKey();
 }

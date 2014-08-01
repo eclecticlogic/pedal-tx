@@ -22,24 +22,24 @@ import java.io.Serializable;
  * @author kabram.
  *
  */
-public interface DAORegistry {
+public interface DAORegistry<E extends Serializable, P extends Serializable> extends DAOLite<E, P> {
 
     /**
      * @param clz The class of the entity
      * @return DAO for the entity.
      */
-    public <E extends Serializable, P extends Serializable> DAO<E, P> get(Class<E> clz);
+    DAO<E, P> get(Class<E> clz);
 
 
     /**
      * @param entity Instance of an entity
      * @return DAO for the entity.
      */
-    public <E extends Serializable, P extends Serializable> DAO<E, P> get(E entity);
-    
-    
+    DAO<E, P> get(E entity);
+
+
     /**
      * Tests various operations on the DAOs (DAOs should implement the TestableDAO interface).
      */
-    public <E extends Serializable, P extends Serializable> void testDAOs();
+    void testDAOs();
 }

@@ -16,15 +16,34 @@
  */
 package com.eclecticlogic.pedal.dm;
 
-import javax.persistence.Query;
+import java.io.Serializable;
+
+import javax.persistence.LockModeType;
 
 /**
- * Interface to perform binding of CustomTypes. 
+ * Create/update/delete on a single entity.  
  * @author kabram.
  *
  */
-@FunctionalInterface
-public interface CustomBinding {
+public interface DAOSingular<E extends Serializable> {
 
-    void bind(Query query);
+    /**
+     * @param entity Entity to create (persist) in the database.
+     * @return
+     */
+    E create(E entity);
+
+
+    E update(E entity);
+
+
+    E delete(E entity);
+
+
+    /**
+     * @param entity Entity to lock
+     * @param lockMode Locking mode
+     * @return Locked entity refreshed to reflect state after locking.
+     */
+    E lock(E entity, LockModeType lockMode);
 }

@@ -108,8 +108,12 @@ public class CopyCommand {
                     try {
                         CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
                                 .getRawConnection(connection));
+                        long t1 = System.currentTimeMillis();
                         copyManager.copyIn("copy " + getEntityName(entityList) + "(" + fieldNames + ") from stdin",
                                 reader);
+                        long elapsedTime = System.currentTimeMillis() - t1;
+                        logger.debug("Wrote {} inserts in {} seconds", entityList.size(),
+                                Math.round(elapsedTime / 10.0) / 100.0);
                     } catch (Exception e) {
                         logger.trace("Command passed: copy {} ( {} ) from stdin {}", getEntityName(entityList),
                                 fieldNames, builder);
@@ -156,11 +160,11 @@ public class CopyCommand {
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.makeClass("com.eclecticlogic.pedal.dialect.postgresql." + clz.getSimpleName()
                 + "$CopyExtractor");
-        
+
         StringBuilder methodBody = new StringBuilder();
         try {
             cc.addInterface(pool.getCtClass(CopyExtractor.class.getName()));
-            
+
             methodBody.append("public String getValueList(Object entity) {\n");
             methodBody.append("try {\n");
             methodBody.append("StringBuilder builder = new StringBuilder();\n");

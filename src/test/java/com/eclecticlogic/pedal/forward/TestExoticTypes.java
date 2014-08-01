@@ -132,6 +132,22 @@ public class TestExoticTypes {
     }
 
 
+    public void testEmptyArrayStoredAsNull() {
+        ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
+
+        ExoticTypes et = new ExoticTypes();
+        et.setLogin("emptyArray");
+        et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
+        et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
+        et.setScores(Lists.newArrayList());
+        et.setStatus(Status.INACTIVE);
+
+        dao.create(et);
+
+        assertEquals(dao.getNullScores().size(), 1);
+    }
+
+
     @SuppressWarnings("unchecked")
     public void testLoaderWithNamespaces() {
         Loader loader = getContext().getBean(Loader.class);
@@ -154,4 +170,5 @@ public class TestExoticTypes {
         Map<String, Object> avars = (Map<String, Object>) output.get("a");
         assertEquals(((SimpleType) avars.get("simple1")).getAmount(), 10);
     }
+
 }

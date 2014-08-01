@@ -14,17 +14,17 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.dm;
-
-import javax.persistence.Query;
+package com.eclecticlogic.pedal.provider.hibernate.dialect;
 
 /**
- * Interface to perform binding of CustomTypes. 
  * @author kabram.
  *
  */
-@FunctionalInterface
-public interface CustomBinding {
+public interface PostgresqlArrayPrimitiveName {
 
-    void bind(Query query);
+    String BOOLEAN = "boolean";
+    String INTEGER = "integer";
+    String LONG = "bigint";
+    String STRING = "varchar";
+    String BIGDECIMAL = "numeric";
 }

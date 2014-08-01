@@ -30,21 +30,21 @@ public interface Select<E extends Serializable> extends OperationQualification<E
      * @param maxResults Maximum number of results to get.
      * @return Fluent interface to continue select definition.
      */
-    public Select<E> returning(int maxResults);
+    Select<E> returning(int maxResults);
 
 
-    public Select<E> startingAt(int startPosition);
-    
-    
-    public List<E> list();
+    Select<E> startingAt(int startPosition);
 
 
-    public Optional<E> get();
+    List<E> list();
 
 
-    public <R> Optional<R> scalar();
+    Optional<E> get();
 
 
-    public <R> List<R> scalarList();
+    <R> Optional<R> scalar();
+
+
+    <R> List<R> scalarList();
 
 }
