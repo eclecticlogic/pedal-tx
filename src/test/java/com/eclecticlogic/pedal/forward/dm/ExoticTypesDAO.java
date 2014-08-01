@@ -77,8 +77,10 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
     }
 
 
-    public List<ExoticTypes> getNullScores() {
-        return select("from ExoticTypes where scores is null").list();
+    public List<ExoticTypes> getNullScores(String login) {
+        return select("from ExoticTypes where login = :login and scores is null") //
+                .bind("login", login) //
+                .list();
     }
 
 

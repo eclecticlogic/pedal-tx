@@ -146,7 +146,7 @@ public class TestExoticTypes {
 
         dao.create(et);
 
-        assertEquals(dao.getNullScores().size(), 1);
+        assertEquals(dao.getNullScores("emptyArray").size(), 1);
     }
 
 
@@ -158,7 +158,11 @@ public class TestExoticTypes {
             et.setLogin("copyCommand" + i);
             et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
             et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
-            et.setScores(Lists.newArrayList(1L, 2L, 3L));
+            if (i != 9) {
+                et.setScores(Lists.newArrayList(1L, 2L, 3L));    
+            } else {
+                et.setScores(Lists.newArrayList());
+            }
             et.setStatus(Status.ACTIVE);
             list.add(et);
         }

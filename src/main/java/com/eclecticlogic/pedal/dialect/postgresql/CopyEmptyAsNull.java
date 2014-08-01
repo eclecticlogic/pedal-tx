@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 
 
 /**
- * Use this annotation on a Postgresql BitString mapped to a List<Boolean> using custom-type mapping to enable
- * CopyCommand support for bulk-inserts.
+ * Use this annotation on a Postgresql array mapped column to send a null value when the corresponding java 
+ * Collection derivative is empty.
  * 
  * @author kabram.
  *
@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface BitString {
+public @interface CopyEmptyAsNull {
 
 }

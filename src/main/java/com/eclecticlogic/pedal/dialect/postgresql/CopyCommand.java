@@ -181,7 +181,7 @@ public class CopyCommand {
                     methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
                     methodBody.append("else {\n");
 
-                    if (method.isAnnotationPresent(BitString.class)) {
+                    if (method.isAnnotationPresent(CopyAsBitString.class)) {
                         methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
                                 + "().iterator();\n");
                         methodBody.append("while (it" + i + ".hasNext()) {\n");
@@ -191,16 +191,15 @@ public class CopyCommand {
                     } else if (Collection.class.isAssignableFrom(method.getReturnType())
                             && method.isAnnotationPresent(Convert.class) == false) {
                         // Postgreql array type.
-                        methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
-                                + "().iterator();\n");
-                        methodBody.append("StringBuilder array" + i + " = new StringBuilder();\n");
-                        methodBody.append("while (it" + i + ".hasNext()) {\n");
-                        methodBody.append("Object o = it" + i + ".next();\n");
-                        methodBody.append("array" + i + ".append(\",\").append(o);\n");
-                        methodBody.append("}\n");
-                        methodBody.append("String arrayStr" + i + " = array" + i + ".length() == 0 ? \"\" : array" + i
-                                + ".substring(1);\n");
-                        methodBody.append("builder.append(\"{\").append(arrayStr" + i + ").append(\"}\");\n");
+                        if (method.isAnnotationPresent(CopyEmptyAsNull.class)) {
+                            methodBody.append("if (typed." +  method.getName() + "().isEmpty()) {\n");
+                            methodBody.append("builder.append(\"\\\\N\");\n");
+                            methodBody.append("} else {\n");
+                            collectionExtractor(methodBody, i, method);
+                            methodBody.append("}\n");
+                        } else {
+                            collectionExtractor(methodBody, i, method);
+                        }
                     } else if (method.isAnnotationPresent(Convert.class)) {
                         Class<?> converterClass = method.getAnnotation(Convert.class).converter();
                         methodBody.append(converterClass.getName() + " c" + i + " = (" + converterClass.getName() + ")"
@@ -237,6 +236,19 @@ public class CopyCommand {
         } catch (InstantiationException | IllegalAccessException | CannotCompileException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+
+    private void collectionExtractor(StringBuilder methodBody, int i, Method method) {
+        methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName() + "().iterator();\n");
+        methodBody.append("StringBuilder array" + i + " = new StringBuilder();\n");
+        methodBody.append("while (it" + i + ".hasNext()) {\n");
+        methodBody.append("Object o = it" + i + ".next();\n");
+        methodBody.append("array" + i + ".append(\",\").append(o);\n");
+        methodBody.append("}\n");
+        methodBody.append("String arrayStr" + i + " = array" + i + ".length() == 0 ? \"\" : array" + i
+                + ".substring(1);\n");
+        methodBody.append("builder.append(\"{\").append(arrayStr" + i + ").append(\"}\");\n");
     }
 
 

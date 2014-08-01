@@ -14,7 +14,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
-import com.eclecticlogic.pedal.dialect.postgresql.BitString;
+import com.eclecticlogic.pedal.dialect.postgresql.CopyAsBitString;
+import com.eclecticlogic.pedal.dialect.postgresql.CopyEmptyAsNull;
 import com.eclecticlogic.pedal.provider.hibernate.ArrayType;
 import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayPrimitiveName;
 
@@ -48,7 +49,7 @@ public class ExoticTypes implements java.io.Serializable {
 
     @Column(name = "countries", nullable = false)
     @Type(type = "com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlBitStringUserType")
-    @BitString
+    @CopyAsBitString
     public List<Boolean> getCountries() {
         return this.countries;
     }
@@ -73,6 +74,7 @@ public class ExoticTypes implements java.io.Serializable {
 
     @Column(name = "scores")
     @Type(type = "com.eclecticlogic.pedal.provider.hibernate.ListType", parameters = { @Parameter(name = ArrayType.DIALECT_PRIMITIVE_NAME, value = PostgresqlArrayPrimitiveName.LONG) })
+    @CopyEmptyAsNull
     public List<Long> getScores() {
         return this.scores;
     }
