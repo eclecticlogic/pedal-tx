@@ -50,7 +50,7 @@ public abstract class ArrayType extends AbstractMutableUserType {
 
 
     protected boolean isEmptyStoredAsNull() {
-        return !"false".equalsIgnoreCase(getParameters().getProperty(EMPTY_IS_NULL));
+        return getParameters() == null || !"false".equalsIgnoreCase(getParameters().getProperty(EMPTY_IS_NULL));
     }
 
 
