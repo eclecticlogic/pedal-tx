@@ -265,6 +265,12 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.2
+
+- Simplified List and Set user types and introduced ability to define if empty list/set should be treated as null or empty array.
+- Copy command records performance stats
+- Introduced DAOLite for cases where simple crud operations are to be performed.
+
 ### 1.4.1 
 
 - Variables created in one load script are available to the next.
