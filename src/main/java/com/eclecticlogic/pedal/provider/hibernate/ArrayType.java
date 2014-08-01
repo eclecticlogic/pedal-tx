@@ -34,11 +34,12 @@ public abstract class ArrayType extends AbstractMutableUserType {
 
     public ArrayType() {
         super();
+        setParameterValues(new Properties());
     }
 
 
     public ArrayType(String dialectPrimitiveName) {
-        setParameterValues(new Properties());
+        this();
         getParameters().setProperty(DIALECT_PRIMITIVE_NAME, dialectPrimitiveName);
     }
 
