@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Properties;
 
 /**
  * @author kabram.
@@ -34,12 +33,10 @@ public abstract class ArrayType extends AbstractMutableUserType {
 
     public ArrayType() {
         super();
-        setParameterValues(new Properties());
     }
 
 
     public ArrayType(String dialectPrimitiveName) {
-        this();
         getParameters().setProperty(DIALECT_PRIMITIVE_NAME, dialectPrimitiveName);
     }
 

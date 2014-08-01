@@ -265,6 +265,12 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.4
+
+- Reduced scope of provided dependencies.
+- Refactored DAOLite.
+- Fixed issue with AbstractUserType getting null properties.
+
 ### 1.4.3
 
 - Bug fix: Error in parameter initialization in array type.
@@ -280,7 +286,7 @@ Variables created in one script are available to the next script when multiple s
 - Variables created in one load script are available to the next.
 - Find method for load script. 
 - Namespaced variables in load scripts.
-- load method for use within scripts to load other scripts.
+- Load method for use within scripts to load other scripts.
 
 ### 1.4.0
 

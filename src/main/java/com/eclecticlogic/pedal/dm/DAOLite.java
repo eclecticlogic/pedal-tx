@@ -19,6 +19,8 @@ package com.eclecticlogic.pedal.dm;
 import java.io.Serializable;
 import java.util.Optional;
 
+import javax.persistence.LockModeType;
+
 /**
  * When performing simple operations against single entities, using a DAOLite instance is easier than getting references
  * to specific DAO instances. This supports single entity create, find by Id, update and delete operations. 
@@ -26,12 +28,33 @@ import java.util.Optional;
  * @author kabram.
  *
  */
-public interface DAOLite<E extends Serializable, P extends Serializable> extends DAOSingular<E> {
+public interface DAOLite {
 
     /**
      * @param clz Entity class type.
      * @param id Primary key
      * @return Entity instance in an optional container.
      */
-    Optional<E> findById(Class<E> clz, P id);
+    <E extends Serializable, P extends Serializable> Optional<E> findById(Class<E> clz, P id);
+
+
+    /**
+     * @param entity Entity to create (persist) in the database.
+     * @return
+     */
+    <E extends Serializable> E create(E entity);
+
+
+    <E extends Serializable> E update(E entity);
+
+
+    <E extends Serializable> E delete(E entity);
+
+
+    /**
+     * @param entity Entity to lock
+     * @param lockMode Locking mode
+     * @return Locked entity refreshed to reflect state after locking.
+     */
+    <E extends Serializable> E lock(E entity, LockModeType lockMode);
 }

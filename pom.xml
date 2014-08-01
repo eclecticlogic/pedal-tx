@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>Pedal - The idiomatic JPA DAO framework.</name>
@@ -198,13 +199,18 @@
                         </path>
                         <property name="hibernate_tools_classpath" refid="hibernate_tools_path" />
                         <echo message="hibernate_tools classpath: ${hibernate_tools_classpath}" />
-                        <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" classpathref="maven.plugin.classpath" />
+                        <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask"
+                            classpathref="maven.plugin.classpath" />
                         <hibernatetool>
-                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties" revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true" detectOptimisticLock="true" />
+                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties"
+                                revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true"
+                                detectOptimisticLock="true" />
                             <hbm2cfgxml ejb3="true" destdir="src/gen/config" />
                         </hibernatetool>
                         <hibernatetool>
-                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties" revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true" detectOptimisticLock="true" />
+                            <jdbcconfiguration propertyfile="src/gen/resources/hibernate.properties"
+                                revengfile="src/gen/resources/hibernate.reveng.xml" detectmanytomany="true"
+                                detectOptimisticLock="true" />
                             <hbm2java jdk5="true" ejb3="true" destdir="src/gen/java" />
                         </hibernatetool>
                     </tasks>
@@ -251,56 +257,42 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.18.2-GA</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
             <version>1.1</version>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${version.hibernate}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${version.hibernate}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -312,9 +304,9 @@
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
             <version>3.4.1</version>
-            <scope>provided</scope>
         </dependency>
 
+        <!-- Dependencies needed (to be provided) for postgresql features -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -323,17 +315,31 @@
         </dependency>
 
         <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.18.2-GA</version>
+            <type>jar</type>
+        </dependency>
+
+        <!-- Dependencies needed (to be provided) for BoneCP connection provider -->
+        <dependency>
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp</artifactId>
             <version>0.8.0.RELEASE</version>
             <scope>provided</scope>
         </dependency>
-        
+
+        <!-- Dependencies needed (to be provided) for test data loader features -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.3.4</version>
+            <version>2.3.2</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -375,12 +381,7 @@
             <version>2.2.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        
+
     </dependencies>
 
     <properties>

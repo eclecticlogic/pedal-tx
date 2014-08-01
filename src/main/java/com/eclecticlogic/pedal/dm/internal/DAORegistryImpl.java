@@ -34,8 +34,7 @@ import com.eclecticlogic.pedal.dm.DAO;
 import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.dm.TestableDAO;
 
-public class DAORegistryImpl<E extends Serializable, P extends Serializable> implements DAORegistry<E, P>,
-        BeanPostProcessor {
+public class DAORegistryImpl implements DAORegistry, BeanPostProcessor {
 
     private Transaction transaction;
     private EntityManagerFactory entityManagerFactory;
@@ -82,23 +81,23 @@ public class DAORegistryImpl<E extends Serializable, P extends Serializable> imp
 
     @Override
     @SuppressWarnings("unchecked")
-    public DAO<E, P> get(Class<E> clz) {
+    public <E extends Serializable, P extends Serializable> DAO<E, P> get(Class<E> clz) {
         return (DAO<E, P>) daosByEntityClass.get(clz);
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public DAO<E, P> get(E entity) {
+    public <E extends Serializable, P extends Serializable> DAO<E, P> get(E entity) {
         return (DAO<E, P>) daosByEntityClass.get(getEntityClass(entity));
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public void testDAOs() {
+    public <E extends Serializable, P extends Serializable> void testDAOs() {
         for (DAO<? extends Serializable, ? extends Serializable> udao : daosByEntityClass.values()) {
-            DAO<E, P> dao = (DAO<E, P>) udao;
+            DAO<E, P> dao = getGenericizedDAO(udao);
             if (dao instanceof TestableDAO) {
                 logger.debug("Testing DAO " + dao.getClass().getName());
                 P pk = ((TestableDAO<P>) dao).getPrototypicalPrimaryKey();
@@ -106,6 +105,18 @@ public class DAORegistryImpl<E extends Serializable, P extends Serializable> imp
                 dao.findById(pk);
             }
         }
+    }
+
+
+    /**
+     * This is to work around java generics coercion.
+     * @param dao
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private <E extends Serializable, P extends Serializable> DAO<E, P> getGenericizedDAO(
+            DAO<? extends Serializable, ? extends Serializable> dao) {
+        return (DAO<E, P>) dao;
     }
 
 
@@ -128,31 +139,31 @@ public class DAORegistryImpl<E extends Serializable, P extends Serializable> imp
     // DAOLite methods.
 
     @Override
-    public Optional<E> findById(Class<E> clz, P id) {
+    public <E extends Serializable, P extends Serializable> Optional<E> findById(Class<E> clz, P id) {
         return get(clz).findById(id);
     }
 
 
     @Override
-    public E create(E entity) {
+    public <E extends Serializable> E create(E entity) {
         return get(entity).create(entity);
     }
 
 
     @Override
-    public E update(E entity) {
+    public <E extends Serializable> E update(E entity) {
         return get(entity).update(entity);
     }
 
 
     @Override
-    public E delete(E entity) {
+    public <E extends Serializable> E delete(E entity) {
         return get(entity).delete(entity);
     }
 
 
     @Override
-    public E lock(E entity, LockModeType lockMode) {
+    public <E extends Serializable> E lock(E entity, LockModeType lockMode) {
         return get(entity).lock(entity, lockMode);
     }
 }

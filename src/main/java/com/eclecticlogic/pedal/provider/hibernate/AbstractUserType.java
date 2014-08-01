@@ -34,7 +34,7 @@ import org.hibernate.usertype.UserType;
  */
 public abstract class AbstractUserType implements UserType, ParameterizedType {
 
-    private Properties parameters;
+    private Properties parameters = new Properties();
 
 
     public Properties getParameters() {
@@ -44,7 +44,11 @@ public abstract class AbstractUserType implements UserType, ParameterizedType {
 
     @Override
     public void setParameterValues(Properties parameters) {
-        this.parameters = parameters;
+        if (parameters != null) {
+            parameters.forEach((k, v) -> {
+                this.parameters.setProperty(k.toString(), v.toString());
+            });
+        }
     }
 
 
