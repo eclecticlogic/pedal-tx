@@ -103,6 +103,7 @@ public class TestExoticTypes {
         assertEquals(et1.getLogin(), "testRead");
         assertTrue(et1.getCountries().get(2));
         assertTrue(et1.getStatus() == Status.INACTIVE);
+        assertTrue(et1.getScores().contains(3L));
     }
 
 

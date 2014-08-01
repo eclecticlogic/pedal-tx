@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.3
+
+- Bug fix: Error in parameter initialization in array type.
+
 ### 1.4.2
 
 - Simplified List and Set user types and introduced ability to define if empty list/set should be treated as null or empty array.
