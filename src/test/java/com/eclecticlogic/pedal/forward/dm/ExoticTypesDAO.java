@@ -24,6 +24,8 @@ import org.hibernate.type.CustomType;
 import org.springframework.stereotype.Component;
 
 import com.eclecticlogic.pedal.Transaction;
+import com.eclecticlogic.pedal.dialect.postgresql.CopyCommand;
+import com.eclecticlogic.pedal.dialect.postgresql.CopyList;
 import com.eclecticlogic.pedal.provider.hibernate.ListType;
 import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayPrimitiveName;
 import com.eclecticlogic.pedal.test.dm.dao.TestDAO;
@@ -35,6 +37,15 @@ import com.mysema.query.jpa.impl.JPAQuery;
  */
 @Component
 public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
+
+    @Inject
+    private CopyCommand copyCommand;
+
+
+    public void setCopyCommand(CopyCommand copyCommand) {
+        this.copyCommand = copyCommand;
+    }
+
 
     @Override
     @Inject
@@ -68,5 +79,12 @@ public class ExoticTypesDAO extends TestDAO<ExoticTypes, String> {
 
     public List<ExoticTypes> getNullScores() {
         return select("from ExoticTypes where scores is null").list();
+    }
+
+
+    public void bulkInsert(List<ExoticTypes> types) {
+        getTransaction().run(() -> {
+            copyCommand.insert(getEntityManager(), new CopyList<ExoticTypes>(types));
+        });
     }
 }

@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.5
+
+- Added support for copy-command to work with array types that are mapped to java.util.Collection derivatives.
+
 ### 1.4.4
 
 - Reduced scope of provided dependencies.

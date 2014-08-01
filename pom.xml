@@ -294,10 +294,13 @@
             <version>${version.hibernate}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- Dependencies needed (to be provided) for QueryDSL -->
         <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
             <version>3.4.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Dependencies needed (to be provided) for postgresql features -->

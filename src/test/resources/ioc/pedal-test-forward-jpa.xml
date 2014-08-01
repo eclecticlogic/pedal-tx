@@ -94,4 +94,11 @@
         <property name="daoRegistry" ref="daoRegistry" />
         <property name="transaction" ref="tx" />
     </bean>
+    
+    <bean id="copyCommand" class="com.eclecticlogic.pedal.dialect.postgresql.CopyCommand">
+        <property name="providerAccessSpi" ref="hibernateProviderAccess"/>
+        <property name="connectionAccessor">
+            <bean class="com.eclecticlogic.pedal.provider.BoneCPConnectionAccessor" />
+        </property>
+    </bean>
 </beans>

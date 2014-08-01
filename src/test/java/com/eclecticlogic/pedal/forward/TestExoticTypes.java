@@ -21,6 +21,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -146,6 +147,26 @@ public class TestExoticTypes {
         dao.create(et);
 
         assertEquals(dao.getNullScores().size(), 1);
+    }
+
+
+    public void testCopyCommand() {
+        List<ExoticTypes> list = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            ExoticTypes et = new ExoticTypes();
+            et.setLogin("copyCommand" + i);
+            et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
+            et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
+            et.setScores(Lists.newArrayList(1L, 2L, 3L));
+            et.setStatus(Status.ACTIVE);
+            list.add(et);
+        }
+
+        ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
+        dao.bulkInsert(list);
+        assertTrue(dao.findById("copyCommand0").isPresent());
+        assertTrue(dao.findById("copyCommand9").isPresent());
     }
 
 

@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,9 +53,10 @@ import com.google.common.base.Throwables;
  * 1. @Column annotation must be present on getters
  * 2. @Column annotation should have column name in it.
  * 3. @Convert annotation should be on getter
- * 4. No embedded id support in entity or fk in entity.
- * 5. No support for custom types (array, etc.)
- * 6. No specific distinction between Temporal TIMESTAMP and DATE.
+ * 4. Array types can only be arrays of primitives. Bit arrays are supported. Annotate with @BitString 
+ * 5. No embedded id support in entity or fk in entity.
+ * 6. No support for custom types.
+ * 7. No specific distinction between Temporal TIMESTAMP and DATE.
  * @author kabram.
  *
  */
@@ -179,7 +181,27 @@ public class CopyCommand {
                     methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
                     methodBody.append("else {\n");
 
-                    if (method.isAnnotationPresent(Convert.class)) {
+                    if (method.isAnnotationPresent(BitString.class)) {
+                        methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
+                                + "().iterator();\n");
+                        methodBody.append("while (it" + i + ".hasNext()) {\n");
+                        methodBody.append("Boolean b = (Boolean)it" + i + ".next();\n");
+                        methodBody.append("builder.append(b.booleanValue() ? \"0\" : \"1\");\n");
+                        methodBody.append("}\n");
+                    } else if (Collection.class.isAssignableFrom(method.getReturnType())
+                            && method.isAnnotationPresent(Convert.class) == false) {
+                        // Postgreql array type.
+                        methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
+                                + "().iterator();\n");
+                        methodBody.append("StringBuilder array" + i + " = new StringBuilder();\n");
+                        methodBody.append("while (it" + i + ".hasNext()) {\n");
+                        methodBody.append("Object o = it" + i + ".next();\n");
+                        methodBody.append("array" + i + ".append(\",\").append(o);\n");
+                        methodBody.append("}\n");
+                        methodBody.append("String arrayStr" + i + " = array" + i + ".length() == 0 ? \"\" : array" + i
+                                + ".substring(1);\n");
+                        methodBody.append("builder.append(\"{\").append(arrayStr" + i + ").append(\"}\");\n");
+                    } else if (method.isAnnotationPresent(Convert.class)) {
                         Class<?> converterClass = method.getAnnotation(Convert.class).converter();
                         methodBody.append(converterClass.getName() + " c" + i + " = (" + converterClass.getName() + ")"
                                 + converterClass.getName() + ".class.newInstance();\n");

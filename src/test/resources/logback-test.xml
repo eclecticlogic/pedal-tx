@@ -9,6 +9,7 @@
 
 	<logger name="org.hibernate.SQL" level="trace" />
 	<logger name="org.hibernate.type" level="info" />
+    <logger name="com.eclecticlogic.pedal.dialect.postgresql.CopyCommand" level="trace" />
 
 	<root level="info">
 		<appender-ref ref="console" />
