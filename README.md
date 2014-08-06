@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.7
+
+- Added support to specify @Column(name) via @AttributeOverrides/@AttributeOverride annotation. However, @Column annotation is still expected on the getter method.
+
 ### 1.4.6
 
 - Added support to have empty collections be recorded as NULL using @CopyEmptyAsNull annotation for copy-command.

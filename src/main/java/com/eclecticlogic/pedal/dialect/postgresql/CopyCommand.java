@@ -16,6 +16,10 @@
  */
 package com.eclecticlogic.pedal.dialect.postgresql;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
@@ -30,6 +34,8 @@ import javassist.CtClass;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.EntityManager;
@@ -49,9 +55,9 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
 /**
- * Limitation in current implementation:
+ * Supported features and limitations in the current implementation:
  * 1. @Column annotation must be present on getters
- * 2. @Column annotation should have column name in it.
+ * 2. @Column annotation should have column name in it or there should be an @AttributeOverrides/@AttributeOverride class-level annotation with the column name.
  * 3. @Convert annotation should be on getter
  * 4. Array types can only be arrays of primitives. Bit arrays are supported. Annotate with @BitString 
  * 5. No embedded id support in entity or fk in entity.
@@ -135,7 +141,7 @@ public class CopyCommand {
                         && method.getAnnotation(GeneratedValue.class).strategy() == GenerationType.IDENTITY) {
                     // Ignore pk with identity strategy.
                 } else if (method.isAnnotationPresent(Column.class)) {
-                    columnName = method.getAnnotation(Column.class).name();
+                    columnName = extractColumnName(method, clz);
                 } else if (method.isAnnotationPresent(JoinColumn.class)
                         && method.getAnnotation(JoinColumn.class).insertable()) {
                     columnName = method.getAnnotation(JoinColumn.class).name();
@@ -151,6 +157,41 @@ public class CopyCommand {
             extractorsByClass.put(clz, getExtractor(clz, methods));
             fieldNamesByClass.put(clz, String.join(",", fields));
         }
+    }
+
+
+    private String extractColumnName(Method method, Class<? extends Serializable> clz) {
+        String beanPropertyName = null;
+        try {
+            BeanInfo info;
+
+            info = Introspector.getBeanInfo(clz);
+
+            for (PropertyDescriptor propDesc : info.getPropertyDescriptors()) {
+                if (propDesc.getReadMethod().equals(method)) {
+                    beanPropertyName = propDesc.getName();
+                    break;
+                }
+            }
+        } catch (IntrospectionException e) {
+            throw Throwables.propagate(e);
+        }
+
+        String columnName = null;
+        if (clz.isAnnotationPresent(AttributeOverrides.class)) {
+            for (AttributeOverride annotation : clz.getAnnotation(AttributeOverrides.class).value()) {
+                if (annotation.name().equals(beanPropertyName)) {
+                    columnName = annotation.column().name();
+                    break;
+                }
+            }
+        } else if (clz.isAnnotationPresent(AttributeOverride.class)) {
+            AttributeOverride annotation = clz.getAnnotation(AttributeOverride.class);
+            if (annotation.name().equals(beanPropertyName)) {
+                columnName = annotation.column().name();
+            }
+        }
+        return columnName == null ? method.getAnnotation(Column.class).name() : columnName;
     }
 
 
@@ -192,7 +233,7 @@ public class CopyCommand {
                             && method.isAnnotationPresent(Convert.class) == false) {
                         // Postgreql array type.
                         if (method.isAnnotationPresent(CopyEmptyAsNull.class)) {
-                            methodBody.append("if (typed." +  method.getName() + "().isEmpty()) {\n");
+                            methodBody.append("if (typed." + method.getName() + "().isEmpty()) {\n");
                             methodBody.append("builder.append(\"\\\\N\");\n");
                             methodBody.append("} else {\n");
                             collectionExtractor(methodBody, i, method);

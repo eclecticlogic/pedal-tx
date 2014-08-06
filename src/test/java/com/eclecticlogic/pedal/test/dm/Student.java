@@ -19,6 +19,7 @@ package com.eclecticlogic.pedal.test.dm;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -38,6 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "student")
+@AttributeOverride(name = "grade", column = @Column(name = "grade"))
 public class Student implements Serializable {
 
     private String id;
@@ -74,7 +76,7 @@ public class Student implements Serializable {
     }
 
 
-    @Column(name = "grade", nullable = true, length = 1)
+    @Column(name = "do-not-use", nullable = true, length = 1)
     @Convert(converter = GradeConverter.class)
     public Grade getGrade() {
         return grade;
