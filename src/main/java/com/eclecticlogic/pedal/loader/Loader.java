@@ -16,6 +16,8 @@
  */
 package com.eclecticlogic.pedal.loader;
 
+import groovy.lang.Closure;
+
 import java.util.Map;
 
 /**
@@ -38,4 +40,11 @@ public interface Loader extends LoaderExecutor {
      */
     public LoaderExecutor withInputs(Map<String, Object> inputs);
 
+    
+    /**
+     * @param methodName Name for custom method
+     * @param closure Closure implementation for method.
+     * @return fluent interface to continue loading.
+     */
+    public Loader withCustomMethod(String methodName, Closure<Object> closure);
 }

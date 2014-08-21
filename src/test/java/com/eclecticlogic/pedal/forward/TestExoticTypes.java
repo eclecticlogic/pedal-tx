@@ -19,6 +19,7 @@ package com.eclecticlogic.pedal.forward;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
+import groovy.lang.Closure;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -159,7 +160,7 @@ public class TestExoticTypes {
             et.setCountries(Lists.newArrayList(false, false, true, false, false, false, true));
             et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
             if (i != 9) {
-                et.setScores(Lists.newArrayList(1L, 2L, 3L));    
+                et.setScores(Lists.newArrayList(1L, 2L, 3L));
             } else {
                 et.setScores(Lists.newArrayList());
             }
@@ -195,6 +196,23 @@ public class TestExoticTypes {
         Map<String, Object> output = (Map<String, Object>) variables.get("output");
         Map<String, Object> avars = (Map<String, Object>) output.get("a");
         assertEquals(((SimpleType) avars.get("simple1")).getAmount(), 10);
+    }
+
+
+    @SuppressWarnings("serial")
+    public void testCustomClosures() {
+        Loader loader = getContext().getBean(Loader.class);
+        Map<String, Object> variables = loader //
+                .withCustomMethod("doubler", new Closure<Object>(this) {
+
+                    @Override
+                    public Object call(Object ...args) {
+                        Integer i = (Integer)args[0];
+                        return i * 2;
+                    }
+                }).withScriptDirectory("loader") //
+                .load("customMethod.loader.groovy");
+        assertEquals(variables.get("myvar"), 400);
     }
 
 }

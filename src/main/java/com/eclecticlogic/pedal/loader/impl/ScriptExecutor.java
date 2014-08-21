@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
@@ -54,6 +55,7 @@ public class ScriptExecutor implements LoaderExecutor {
 
     private DAORegistry daoRegistry;
     private Transaction transaction;
+    private Map<String, Closure<Object>> customMethods;
 
 
     public ScriptExecutor(DAORegistry daoRegistry, Transaction transaction) {
@@ -69,6 +71,11 @@ public class ScriptExecutor implements LoaderExecutor {
 
     public void setInputs(Map<String, Object> inputs) {
         this.inputs = inputs;
+    }
+
+
+    public void setCustomMethods(Map<String, Closure<Object>> customMethods) {
+        this.customMethods = customMethods;
     }
 
 
@@ -197,6 +204,11 @@ public class ScriptExecutor implements LoaderExecutor {
         binding.setVariable("row", row);
         binding.setVariable("find", find);
         binding.setVariable("load", load);
+
+        // Custom methods
+        for (Entry<String, Closure<Object>> entry : customMethods.entrySet()) {
+            binding.setVariable(entry.getKey(), entry.getValue());
+        }
         return binding;
     }
 

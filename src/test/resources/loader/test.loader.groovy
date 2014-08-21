@@ -17,8 +17,6 @@ def i = 0;
         widget = row 'abc', et
     }
     
-    println widget.id
-    
     foundWidget = find(Widget, 1)
 }
 

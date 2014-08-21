@@ -16,6 +16,8 @@
  */
 package com.eclecticlogic.pedal.loader.impl;
 
+import groovy.lang.Closure;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import com.eclecticlogic.pedal.dm.DAORegistry;
 import com.eclecticlogic.pedal.loader.Loader;
 import com.eclecticlogic.pedal.loader.LoaderExecutor;
 import com.eclecticlogic.pedal.loader.Script;
+import com.google.common.collect.Maps;
 
 /**
  * Data loader entry class.
@@ -37,6 +40,8 @@ public class LoaderImpl implements Loader {
     private DAORegistry daoRegistry;
     private Transaction transaction;
 
+    private Map<String, Closure<Object>> customMethods = Maps.newHashMap();
+    
 
     public void setDaoRegistry(DAORegistry daoRegistry) {
         this.daoRegistry = daoRegistry;
@@ -53,11 +58,19 @@ public class LoaderImpl implements Loader {
         scriptDirectory = directory;
         return this;
     }
+    
+    
+    @Override
+    public Loader withCustomMethod(String methodName, Closure<Object> closure) {
+        customMethods.put(methodName, closure);
+        return this;
+    }
 
 
     private ScriptExecutor createScriptExecutor() {
         ScriptExecutor executor = new ScriptExecutor(daoRegistry, transaction);
         executor.setScriptDirectory(scriptDirectory);
+        executor.setCustomMethods(customMethods);
         return executor;
     }
 
