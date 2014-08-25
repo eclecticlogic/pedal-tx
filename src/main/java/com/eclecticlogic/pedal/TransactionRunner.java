@@ -46,5 +46,11 @@ public interface TransactionRunner {
      * @return
      */
     public <R> R exec(Function<Context, R> block);
+    
+    
+    /**
+     * Flush the underlying JPA session.
+     */
+    public void flush();
 
 }

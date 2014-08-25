@@ -35,16 +35,17 @@ public interface Loader extends LoaderExecutor {
 
 
     /**
-     * @param inputs Objects that can be referenced (by their keys) in the load script.
-     * @return fluent interface to continue loading.
-     */
-    public LoaderExecutor withInputs(Map<String, Object> inputs);
-
-    
-    /**
      * @param methodName Name for custom method
      * @param closure Closure implementation for method.
      * @return fluent interface to continue loading.
      */
     public Loader withCustomMethod(String methodName, Closure<Object> closure);
+
+
+    /**
+     * @param inputs Objects that can be referenced (by their keys) in the load script.
+     * @return fluent interface to continue loading.
+     */
+    public LoaderExecutor withInputs(Map<String, Object> inputs);
+
 }

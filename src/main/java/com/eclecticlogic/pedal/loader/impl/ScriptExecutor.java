@@ -199,11 +199,22 @@ public class ScriptExecutor implements LoaderExecutor {
             };
         };
 
+
+        Closure<Object> flush = new Closure<Object>(this) {
+
+            @Override
+            public Object call(Object... args) {
+                transaction.flush();
+                return null;
+            };
+        };
+        
         NamespacedBinding binding = new NamespacedBinding();
         binding.setVariable("table", table);
         binding.setVariable("row", row);
         binding.setVariable("find", find);
         binding.setVariable("load", load);
+        binding.setVariable("flush", flush);
 
         // Custom methods
         for (Entry<String, Closure<Object>> entry : customMethods.entrySet()) {

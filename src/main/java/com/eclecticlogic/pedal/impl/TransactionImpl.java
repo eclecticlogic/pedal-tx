@@ -138,6 +138,12 @@ public class TransactionImpl implements Transaction {
     }
 
 
+    @Override
+    public void flush() {
+        getPlatformTransactionManager().getTransaction(getTransactionDefinition()).flush();
+    }
+
+
     private TransactionDefinition getTransactionDefinition() {
         if (localTransactionDefinition.get().isEmpty()) {
             DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
