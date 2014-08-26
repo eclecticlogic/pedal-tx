@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.10
+
+- Added defaultRow closure to simply definition of default attribute values.
+
 ### 1.4.9
 
 - Added ability to flush session to transaction and data load script.

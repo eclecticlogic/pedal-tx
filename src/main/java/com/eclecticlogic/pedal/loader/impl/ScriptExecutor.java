@@ -179,7 +179,17 @@ public class ScriptExecutor implements LoaderExecutor {
             @Override
             public Object call(Object... args) {
                 return invokeRowClosure(args);
-            };
+            }
+        };
+
+        Closure<Object> defaultRow = new Closure<Object>(this) {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public Object call(Object... args) {
+                invokeDefaultRowClosure((Closure<Object>) args[0]);
+                return null;
+            }
         };
 
         Closure<Object> find = new Closure<Object>(this) {
@@ -199,7 +209,6 @@ public class ScriptExecutor implements LoaderExecutor {
             };
         };
 
-
         Closure<Object> flush = new Closure<Object>(this) {
 
             @Override
@@ -208,10 +217,11 @@ public class ScriptExecutor implements LoaderExecutor {
                 return null;
             };
         };
-        
+
         NamespacedBinding binding = new NamespacedBinding();
         binding.setVariable("table", table);
         binding.setVariable("row", row);
+        binding.setVariable("defaultRow", defaultRow);
         binding.setVariable("find", find);
         binding.setVariable("load", load);
         binding.setVariable("flush", flush);
@@ -246,6 +256,11 @@ public class ScriptExecutor implements LoaderExecutor {
     }
 
 
+    private void invokeDefaultRowClosure(Closure<Object> closure) {
+        scriptContextStack.peek().setDefaultRowClosure(closure);
+    }
+
+
     private Object invokeRowClosure(Object... attributeValues) {
         Serializable instance = instantiate();
         DelegatingGroovyObjectSupport<Serializable> delegate = new DelegatingGroovyObjectSupport<Serializable>(instance);
@@ -253,6 +268,7 @@ public class ScriptExecutor implements LoaderExecutor {
         for (int i = 0; i < scriptContextStack.peek().getAttributes().size(); i++) {
             delegate.setProperty(scriptContextStack.peek().getAttributes().get(i), attributeValues[i]);
         }
+        instance = (Serializable) scriptContextStack.peek().getDefaultRowClosure().call(instance);
         Object entity = daoRegistry.get(instance).create(instance);
         scriptContextStack.peek().getCreatedEntities().add(entity);
         return entity;

@@ -16,6 +16,8 @@
  */
 package com.eclecticlogic.pedal.loader.impl;
 
+import groovy.lang.Closure;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,14 @@ public class ScriptContext {
     private Class<?> entityClass;
     private List<String> attributes;
     private List<Object> createdEntities = new ArrayList<>();
+    @SuppressWarnings("serial")
+    private Closure<Object> defaultRowClosure = new Closure<Object>(this) {
+
+        @Override
+        public Object call(Object argument) {
+            return argument;
+        }
+    };
 
 
     public Class<?> getEntityClass() {
@@ -52,6 +62,16 @@ public class ScriptContext {
 
     public List<Object> getCreatedEntities() {
         return createdEntities;
+    }
+
+
+    public Closure<Object> getDefaultRowClosure() {
+        return defaultRowClosure;
+    }
+
+
+    public void setDefaultRowClosure(Closure<Object> defaultRowClosure) {
+        this.defaultRowClosure = defaultRowClosure;
     }
 
 }
