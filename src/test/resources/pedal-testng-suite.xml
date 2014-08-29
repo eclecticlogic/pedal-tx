@@ -1,6 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="pedalSuite" parallel="tests" verbose="1">
+
+    <listeners>
+        <listener class-name="com.eclecticlogic.pedal.testng.HookListener"/>
+    </listeners>
     <test name="basic">
         <classes>
             <class name="com.eclecticlogic.pedal.test.BasicTest" />
