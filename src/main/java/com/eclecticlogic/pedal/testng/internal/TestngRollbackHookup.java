@@ -14,12 +14,15 @@
  * limitations under the License.
  * 
  */
-package com.eclecticlogic.pedal.impl;
+package com.eclecticlogic.pedal.testng.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
 
+import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.testng.RollbackOnSuccess;
 
 /**
@@ -27,6 +30,9 @@ import com.eclecticlogic.pedal.testng.RollbackOnSuccess;
  *
  */
 public class TestngRollbackHookup implements IHookable {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestngRollbackHookup.class);
+
 
     /**
      * @see org.testng.IHookable#run(org.testng.IHookCallBack, org.testng.ITestResult)
@@ -44,9 +50,35 @@ public class TestngRollbackHookup implements IHookable {
             boolean rollbackOnSuccess = (classLevel != null && classLevel.enabled() && methodLevel == null || methodLevel
                     .enabled()) || (classLevel == null && methodLevel != null && methodLevel.enabled());
             if (rollbackOnSuccess) {
-
+                Transaction tx = getTransaction(testResult.getInstance());
+                if (tx == null) {
+                    logger.error("@RollbackOnSuccess is defined but no field in the test provides access to "
+                            + "pedal's Transaction object.");
+                    callBack.runTestMethod(testResult);
+                } else {
+                    try {
+                        tx.run(() -> {
+                            callBack.runTestMethod(testResult);
+                            if (!testResult.isSuccess()) {
+                                throw new RollbackException();
+                            }
+                        });
+                    } catch (RollbackException e) {
+                        // Eat it.
+                    }
+                }
             }
-        }
+        } // end else
+    }
+
+
+    /**
+     * @param instance
+     * @return Transaction reference from a field of the type in the instance, null if no field exists.
+     */
+    private Transaction getTransaction(Object instance) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
