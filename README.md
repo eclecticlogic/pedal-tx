@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.11
+
+- Added NoopTransactionMock and NoopContext to facilitate mock testing.
+
 ### 1.4.10
 
 - Added defaultRow closure to simply definition of default attribute values.
