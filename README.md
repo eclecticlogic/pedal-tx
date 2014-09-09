@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.12
+
+- Added withInput method to loader DSL to allow loading of another DSL with specific input values.
+
 ### 1.4.11
 
 - Added NoopTransactionMock and NoopContext to facilitate mock testing.

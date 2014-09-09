@@ -4,6 +4,12 @@ import com.eclecticlogic.pedal.forward.dm.Widget;
 
 output = load('a': 'simple.loader.groovy', 'b': 'simple.loader.groovy')
 
+myIndex = 101
+
+inputReaderVars = withInput(['index': myIndex]).load('input.reader.groovy')
+
+assert inputReaderVars.inputReaderReturn.amount == 101000
+
 def name = 'pedal'
 
 def i = 0;

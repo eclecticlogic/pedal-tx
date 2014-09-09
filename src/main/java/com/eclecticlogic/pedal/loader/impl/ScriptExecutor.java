@@ -50,6 +50,7 @@ public class ScriptExecutor implements LoaderExecutor {
 
     private String scriptDirectory;
     private Stack<ScriptContext> scriptContextStack = new Stack<>();
+    private Stack<Map<String, Object>> scriptInputs = new Stack<>(); // used to pass inputs to scripts when defined using withInput
 
     private Map<String, Object> inputs = new HashMap<>();
 
@@ -118,12 +119,13 @@ public class ScriptExecutor implements LoaderExecutor {
 
     @Override
     public Map<String, Object> loadNamespaced(Collection<Script> scripts) {
-
         Map<String, Object> variables = new HashMap<>();
         // Add overall variables
-        for (String key : inputs.keySet()) {
-            variables.put(key, inputs.get(key));
-        }
+        Map<String, Object> inputVariables = scriptInputs.isEmpty() ? inputs : scriptInputs.pop();
+        inputVariables.forEach((k, v) -> {
+            variables.put(k, v);
+        });
+
         ResourceLoader loader = new DefaultResourceLoader();
 
         for (Script script : scripts) {
@@ -201,6 +203,14 @@ public class ScriptExecutor implements LoaderExecutor {
             };
         };
 
+        Closure<Object> withInput = new Closure<Object>(this) {
+
+            @Override
+            public Object call(Object... args) {
+                return invokeWithInputClosure(getOwner(), args[0]);
+            };
+        };
+
         Closure<Object> load = new Closure<Object>(this) {
 
             @Override
@@ -223,6 +233,7 @@ public class ScriptExecutor implements LoaderExecutor {
         binding.setVariable("row", row);
         binding.setVariable("defaultRow", defaultRow);
         binding.setVariable("find", find);
+        binding.setVariable("withInput", withInput);
         binding.setVariable("load", load);
         binding.setVariable("flush", flush);
 
@@ -281,10 +292,18 @@ public class ScriptExecutor implements LoaderExecutor {
 
 
     @SuppressWarnings("unchecked")
+    private Object invokeWithInputClosure(Object owner, Object arg) {
+        Map<String, Object> scriptInput = (Map<String, Object>) arg;
+        scriptInputs.push(scriptInput);
+        return owner;
+    }
+
+
+    @SuppressWarnings("unchecked")
     private Object invokeLoadClosure(Object[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("The load() method should be called with a map of namespace and "
-                    + "script names or a list of one or script names.");
+                    + "script names or a list of one or more script names.");
         } else if (args[0] instanceof Map) {
             Map<String, String> scriptMap = (Map<String, String>) args[0];
             List<Script> scripts = new ArrayList<>();
