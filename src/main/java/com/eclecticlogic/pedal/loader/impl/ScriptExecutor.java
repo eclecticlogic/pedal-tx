@@ -207,7 +207,7 @@ public class ScriptExecutor implements LoaderExecutor {
 
             @Override
             public Object call(Object... args) {
-                return invokeWithInputClosure(getOwner(), args[0]);
+                return invokeWithInputClosure(args[0]);
             };
         };
 
@@ -292,10 +292,28 @@ public class ScriptExecutor implements LoaderExecutor {
 
 
     @SuppressWarnings("unchecked")
-    private Object invokeWithInputClosure(Object owner, Object arg) {
+    private Object invokeWithInputClosure(Object arg) {
         Map<String, Object> scriptInput = (Map<String, Object>) arg;
         scriptInputs.push(scriptInput);
-        return owner;
+        // Return a constrained set of operations that are possible. Returning owner will result in the entire set
+        // of methods in this class being exposed.
+        return new Object() {
+
+            @SuppressWarnings("unused")
+            public Map<String, Object> load(String loadScript, String... additionalScripts) {
+                return ScriptExecutor.this.load(loadScript, additionalScripts);
+            }
+
+
+            @SuppressWarnings("unused")
+            public Map<String, Object> load(Map<String, String> namespacedScripts) {
+                List<Script> scripts = new ArrayList<>();
+                namespacedScripts.forEach((namespace, scriptName) -> {
+                    scripts.add(Script.with(scriptName, namespace));
+                });
+                return ScriptExecutor.this.loadNamespaced(scripts);
+            }
+        };
     }
 
 
