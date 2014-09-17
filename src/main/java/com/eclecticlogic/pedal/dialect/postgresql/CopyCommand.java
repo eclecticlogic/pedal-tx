@@ -38,6 +38,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Convert;
+import javax.persistence.EmbeddedId;
 import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,6 +49,7 @@ import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 import com.eclecticlogic.pedal.provider.ConnectionAccessor;
 import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
@@ -145,6 +147,15 @@ public class CopyCommand {
                 } else if (method.isAnnotationPresent(JoinColumn.class)
                         && method.getAnnotation(JoinColumn.class).insertable()) {
                     columnName = method.getAnnotation(JoinColumn.class).name();
+                } else if (method.isAnnotationPresent(EmbeddedId.class)) {
+                    // Handle Attribute override annotation ...
+                    if (method.isAnnotationPresent(AttributeOverrides.class)) {
+                        AttributeOverrides overrides = method.getAnnotation(AttributeOverrides.class);
+                        for (AttributeOverride override : overrides.value()) {
+                            fields.add(override.column().name());
+                        }
+                    }
+                    methods.add(method);
                 }
                 if (columnName != null) {
                     // Certain one-to-on join situations can lead to multiple columns with the same column-name.
@@ -196,7 +207,9 @@ public class CopyCommand {
 
 
     /**
-     * Revisit this after javassist support java 8
+     * @param clz
+     * @param fieldMethods
+     * @return Create a class to generate the copy row strings.
      */
     @SuppressWarnings({ "unchecked" })
     private <E extends Serializable> CopyExtractor<E> getExtractor(Class<E> clz, List<Method> fieldMethods) {
@@ -219,44 +232,62 @@ public class CopyCommand {
                 } else {
                     methodBody.append(method.getReturnType().getName() + " v" + i + " = typed." + method.getName()
                             + "();\n");
-                    methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
-                    methodBody.append("else {\n");
-
-                    if (method.isAnnotationPresent(CopyAsBitString.class)) {
-                        methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
-                                + "().iterator();\n");
-                        methodBody.append("while (it" + i + ".hasNext()) {\n");
-                        methodBody.append("Boolean b = (Boolean)it" + i + ".next();\n");
-                        methodBody.append("builder.append(b.booleanValue() ? \"0\" : \"1\");\n");
-                        methodBody.append("}\n");
-                    } else if (Collection.class.isAssignableFrom(method.getReturnType())
-                            && method.isAnnotationPresent(Convert.class) == false) {
-                        // Postgreql array type.
-                        if (method.isAnnotationPresent(CopyEmptyAsNull.class)) {
-                            methodBody.append("if (typed." + method.getName() + "().isEmpty()) {\n");
-                            methodBody.append("builder.append(\"\\\\N\");\n");
-                            methodBody.append("} else {\n");
-                            collectionExtractor(methodBody, i, method);
-                            methodBody.append("}\n");
-                        } else {
-                            collectionExtractor(methodBody, i, method);
-                        }
-                    } else if (method.isAnnotationPresent(Convert.class)) {
-                        Class<?> converterClass = method.getAnnotation(Convert.class).converter();
-                        methodBody.append(converterClass.getName() + " c" + i + " = (" + converterClass.getName() + ")"
-                                + converterClass.getName() + ".class.newInstance();\n");
-                        methodBody.append("builder.append(c" + i + ".convertToDatabaseColumn(v" + i + "));\n");
-                    } else if (method.isAnnotationPresent(JoinColumn.class)) {
-                        // We need to get the id of the joined object.
-                        for (Method method2 : method.getReturnType().getMethods()) {
-                            if (method2.isAnnotationPresent(Id.class)) {
-                                methodBody.append("builder.append(v" + i + "." + method2.getName() + "());\n");
+                    if (method.isAnnotationPresent(EmbeddedId.class)) {
+                        // Embedded id
+                        if (method.isAnnotationPresent(AttributeOverrides.class)) {
+                            AttributeOverrides overrides = method.getAnnotation(AttributeOverrides.class);
+                            for (int j = 0; j < overrides.value().length; j++) {
+                                AttributeOverride override = overrides.value()[j];
+                                methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
+                                methodBody.append("else {\n");
+                                Method idMethod = BeanUtils.getPropertyDescriptor(method.getReturnType(), override.name()).getReadMethod();
+                                methodBody.append("builder.append(v" + i + "." + idMethod.getName() + "());\n");
+                                methodBody.append("}\n");
+                                if (j != overrides.value().length - 1) {
+                                    methodBody.append("builder.append(\"\\t\");\n");
+                                }
                             }
                         }
                     } else {
-                        methodBody.append("builder.append(v" + i + ");\n");
+                        methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
+                        methodBody.append("else {\n");
+
+                        if (method.isAnnotationPresent(CopyAsBitString.class)) {
+                            methodBody.append("java.util.Iterator it" + i + " = typed." + method.getName()
+                                    + "().iterator();\n");
+                            methodBody.append("while (it" + i + ".hasNext()) {\n");
+                            methodBody.append("Boolean b = (Boolean)it" + i + ".next();\n");
+                            methodBody.append("builder.append(b.booleanValue() ? \"0\" : \"1\");\n");
+                            methodBody.append("}\n");
+                        } else if (Collection.class.isAssignableFrom(method.getReturnType())
+                                && method.isAnnotationPresent(Convert.class) == false) {
+                            // Postgreql array type.
+                            if (method.isAnnotationPresent(CopyEmptyAsNull.class)) {
+                                methodBody.append("if (typed." + method.getName() + "().isEmpty()) {\n");
+                                methodBody.append("builder.append(\"\\\\N\");\n");
+                                methodBody.append("} else {\n");
+                                collectionExtractor(methodBody, i, method);
+                                methodBody.append("}\n");
+                            } else {
+                                collectionExtractor(methodBody, i, method);
+                            }
+                        } else if (method.isAnnotationPresent(Convert.class)) {
+                            Class<?> converterClass = method.getAnnotation(Convert.class).converter();
+                            methodBody.append(converterClass.getName() + " c" + i + " = (" + converterClass.getName()
+                                    + ")" + converterClass.getName() + ".class.newInstance();\n");
+                            methodBody.append("builder.append(c" + i + ".convertToDatabaseColumn(v" + i + "));\n");
+                        } else if (method.isAnnotationPresent(JoinColumn.class)) {
+                            // We need to get the id of the joined object.
+                            for (Method method2 : method.getReturnType().getMethods()) {
+                                if (method2.isAnnotationPresent(Id.class)) {
+                                    methodBody.append("builder.append(v" + i + "." + method2.getName() + "());\n");
+                                }
+                            }
+                        } else {
+                            methodBody.append("builder.append(v" + i + ");\n");
+                        }
+                        methodBody.append("}\n");
                     }
-                    methodBody.append("}\n");
                 }
                 if (i != fieldMethods.size() - 1) {
                     methodBody.append("builder.append(\"\\t\");\n");

@@ -36,6 +36,9 @@ import org.testng.xml.XmlTest;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypes;
 import com.eclecticlogic.pedal.forward.dm.ExoticTypesDAO;
+import com.eclecticlogic.pedal.forward.dm.Planet;
+import com.eclecticlogic.pedal.forward.dm.PlanetDAO;
+import com.eclecticlogic.pedal.forward.dm.PlanetId;
 import com.eclecticlogic.pedal.forward.dm.SimpleType;
 import com.eclecticlogic.pedal.forward.dm.Status;
 import com.eclecticlogic.pedal.loader.Loader;
@@ -151,7 +154,7 @@ public class TestExoticTypes {
     }
 
 
-    public void testCopyCommand() {
+    void testCopyCommand() {
         List<ExoticTypes> list = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -206,8 +209,8 @@ public class TestExoticTypes {
                 .withCustomMethod("doubler", new Closure<Object>(this) {
 
                     @Override
-                    public Object call(Object ...args) {
-                        Integer i = (Integer)args[0];
+                    public Object call(Object... args) {
+                        Integer i = (Integer) args[0];
                         return i * 2;
                     }
                 }).withScriptDirectory("loader") //
@@ -215,4 +218,19 @@ public class TestExoticTypes {
         assertEquals(variables.get("myvar"), 400);
     }
 
+
+    public void testCopyCommandWithEmbeddedId() {
+        List<Planet> list = new ArrayList<>();
+        {
+            Planet p = new Planet();
+            PlanetId id = new PlanetId();
+            id.setName("jupiter");
+            id.setPosition(6);
+            p.setId(id);
+            p.setDistance(100);
+            list.add(p);
+        }
+        PlanetDAO dao = getContext().getBean(PlanetDAO.class);
+        dao.bulkInsert(list);
+    }
 }

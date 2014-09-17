@@ -39,4 +39,13 @@ ALTER TABLE "simple_type" ADD CONSTRAINT "Key3" PRIMARY KEY ("id")
 ALTER TABLE "widget" ADD CONSTRAINT "Relationship1" FOREIGN KEY ("login_type") REFERENCES "exotic_types" ("login") ON DELETE NO ACTION ON UPDATE NO ACTION
 ;
 
+CREATE TABLE "planet" (
+    "name" varchar not null,
+    "position" integer not null,
+    "distance" integer not null
+) WITH (OIDS = FALSE)
+;
+    
 
+ALTER TABLE "planet" ADD CONSTRAINT "Key4" PRIMARY KEY ("name", "position")
+;
