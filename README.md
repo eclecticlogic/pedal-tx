@@ -265,7 +265,11 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
-### 1.4.15 
+### 1.4.15
+
+- CopyCommand synthetic extractor class is created with unique names to prevent linkage error when the command is initially called in concurrent threads.
+
+### 1.4.14 
 
 - Added support for embedded id pk in CopyCommand as long as @AttributeOverrides annotation is used in the Entity. Note: The CopyCommand javassist code generation logic is need of refactoring. To put it politely, it is ugly right now.
 

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -75,7 +76,9 @@ public class CopyCommand {
 
     private ConcurrentHashMap<Class<? extends Serializable>, String> fieldNamesByClass = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Class<? extends Serializable>, CopyExtractor<? extends Serializable>> extractorsByClass = new ConcurrentHashMap<>();
-
+    // This is used to prevent linkage error due to concurrent creation of classes.
+    private static AtomicInteger extractorNameSuffix = new AtomicInteger();
+    
     private static Logger logger = LoggerFactory.getLogger(CopyCommand.class);
 
 
@@ -215,7 +218,7 @@ public class CopyCommand {
     private <E extends Serializable> CopyExtractor<E> getExtractor(Class<E> clz, List<Method> fieldMethods) {
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.makeClass("com.eclecticlogic.pedal.dialect.postgresql." + clz.getSimpleName()
-                + "$CopyExtractor");
+                + "$CopyExtractor_" + extractorNameSuffix.incrementAndGet());
 
         StringBuilder methodBody = new StringBuilder();
         try {
