@@ -182,7 +182,7 @@ public class CopyCommand {
             info = Introspector.getBeanInfo(clz);
 
             for (PropertyDescriptor propDesc : info.getPropertyDescriptors()) {
-                if (propDesc.getReadMethod().equals(method)) {
+                if (method.equals(propDesc.getReadMethod())) {
                     beanPropertyName = propDesc.getName();
                     break;
                 }

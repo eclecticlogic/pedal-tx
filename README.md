@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.16
+
+- Fixed issue with CopyCommand when you have a @Transient setter without getter.
+
 ### 1.4.15
 
 - CopyCommand synthetic extractor class is created with unique names to prevent linkage error when the command is initially called in concurrent threads.

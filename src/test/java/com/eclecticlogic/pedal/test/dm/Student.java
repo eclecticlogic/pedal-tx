@@ -29,6 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -62,6 +63,12 @@ public class Student implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+
+    @Transient
+    public void setMiddleName(String value) {
+        // This is to ensure that the copy command doesn't fail if there are setters without getters.
     }
 
 
