@@ -78,7 +78,7 @@ public class CopyCommand {
     private ConcurrentHashMap<Class<? extends Serializable>, CopyExtractor<? extends Serializable>> extractorsByClass = new ConcurrentHashMap<>();
     // This is used to prevent linkage error due to concurrent creation of classes.
     private static AtomicInteger extractorNameSuffix = new AtomicInteger();
-    
+
     private static Logger logger = LoggerFactory.getLogger(CopyCommand.class);
 
 
@@ -96,14 +96,18 @@ public class CopyCommand {
      * @param lists Entities to be inserted using the Postgres COPY command.
      */
     public <E extends Serializable> void insert(EntityManager entityManager, CopyList<E> entityList) {
-        if (entityList.size() > 0) {
-            _insert(entityManager, entityList);
+        if (!entityList.isEmpty()) {
+            insert(entityManager, packageCopyData(entityList));
         }
     }
 
 
+    /**
+     * @param entityList
+     * @return Packages up the entity list as standalone data that can be serialized and inserted at a later point.
+     */
     @SuppressWarnings("unchecked")
-    private <E extends Serializable> void _insert(EntityManager entityManager, CopyList<E> entityList) {
+    public <E extends Serializable> PackagedCopyData packageCopyData(CopyList<E> entityList) {
         Class<? extends Serializable> clz = entityList.get(0).getClass();
         setupFor(clz);
         String fieldNames = fieldNamesByClass.get(clz);
@@ -114,7 +118,21 @@ public class CopyCommand {
             builder.append("\n");
         }
 
-        StringReader reader = new StringReader(builder.toString());
+        PackagedCopyData data = new PackagedCopyData();
+        data.setBody(builder.toString());
+        data.setSize(entityList.size());
+        data.setCopySql("copy " + getEntityName(entityList) + "(" + fieldNames + ") from stdin");
+        return data;
+    }
+
+
+    /**
+     * Inserts packaged copy data using the COPY command.
+     * @param entityManager
+     * @param data
+     */
+    public void insert(EntityManager entityManager, PackagedCopyData data) {
+        StringReader reader = new StringReader(data.getBody());
         providerAccessSpi.run(
                 entityManager,
                 connection -> {
@@ -122,14 +140,12 @@ public class CopyCommand {
                         CopyManager copyManager = new CopyManager((BaseConnection) connectionAccessor
                                 .getRawConnection(connection));
                         long t1 = System.currentTimeMillis();
-                        copyManager.copyIn("copy " + getEntityName(entityList) + "(" + fieldNames + ") from stdin",
-                                reader);
+                        copyManager.copyIn(data.getCopySql(), reader);
                         long elapsedTime = System.currentTimeMillis() - t1;
-                        logger.debug("Wrote {} inserts in {} seconds", entityList.size(),
+                        logger.debug("Wrote {} inserts in {} seconds", data.getSize(),
                                 Math.round(elapsedTime / 10.0) / 100.0);
                     } catch (Exception e) {
-                        logger.trace("Command passed: copy {} ( {} ) from stdin {}", getEntityName(entityList),
-                                fieldNames, builder);
+                        logger.trace("Command passed: {}", data);
                         throw Throwables.propagate(e);
                     }
                 });
@@ -243,7 +259,8 @@ public class CopyCommand {
                                 AttributeOverride override = overrides.value()[j];
                                 methodBody.append("if (v" + i + " == null) {builder.append(\"\\\\N\");}\n");
                                 methodBody.append("else {\n");
-                                Method idMethod = BeanUtils.getPropertyDescriptor(method.getReturnType(), override.name()).getReadMethod();
+                                Method idMethod = BeanUtils.getPropertyDescriptor(method.getReturnType(),
+                                        override.name()).getReadMethod();
                                 methodBody.append("builder.append(v" + i + "." + idMethod.getName() + "());\n");
                                 methodBody.append("}\n");
                                 if (j != overrides.value().length - 1) {

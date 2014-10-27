@@ -265,6 +265,10 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.17
+
+- CopyCommand now allows access to "packaged" copy data that can be serialized elsewhere and subsequently de-serialized and inserted into the database.
+
 ### 1.4.16
 
 - Fixed issue with CopyCommand when you have a @Transient setter without getter.
