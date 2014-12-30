@@ -265,21 +265,25 @@ Variables created in one script are available to the next script when multiple s
 
 # Release notes
 
+### 1.4.18
+ 
+- `CopyCommand` now supports `@CopyConverter` annotation to support custom type-conversions.
+
 ### 1.4.17
 
-- CopyCommand now allows access to "packaged" copy data that can be serialized elsewhere and subsequently de-serialized and inserted into the database.
+- `CopyCommand` now allows access to "packaged" copy data that can be serialized elsewhere and subsequently de-serialized and inserted into the database.
 
 ### 1.4.16
 
-- Fixed issue with CopyCommand when you have a @Transient setter without getter.
+- Fixed issue with `CopyCommand` when you have a `@Transient` setter without getter.
 
 ### 1.4.15
 
-- CopyCommand synthetic extractor class is created with unique names to prevent linkage error when the command is initially called in concurrent threads.
+- `CopyCommand` synthetic extractor class is created with unique names to prevent linkage error when the command is initially called in concurrent threads.
 
 ### 1.4.14 
 
-- Added support for embedded id pk in CopyCommand as long as @AttributeOverrides annotation is used in the Entity. Note: The CopyCommand javassist code generation logic is need of refactoring. To put it politely, it is ugly right now.
+- Added support for embedded id pk in `CopyCommand` as long as `@AttributeOverrides` annotation is used in the Entity. Note: The `CopyCommand` javassist code generation logic is in need of refactoring. To put it politely, it is ugly right now.
 
 ### 1.4.13
 
@@ -291,7 +295,7 @@ Variables created in one script are available to the next script when multiple s
 
 ### 1.4.11
 
-- Added NoopTransactionMock and NoopContext to facilitate mock testing.
+- Added `NoopTransactionMock` and `NoopContext` to facilitate mock testing.
 
 ### 1.4.10
 
@@ -307,21 +311,21 @@ Variables created in one script are available to the next script when multiple s
 
 ### 1.4.7
 
-- Added support to specify @Column(name) via @AttributeOverrides/@AttributeOverride annotation. However, @Column annotation is still expected on the getter method.
+- Added `@CopyCommand` support to specify `@Column(name)` via `@AttributeOverrides/@AttributeOverride` annotation. However, `@Column` annotation is still expected on the getter method.
 
 ### 1.4.6
 
-- Added support to have empty collections be recorded as NULL using @CopyEmptyAsNull annotation for copy-command.
+- Added support to have empty collections be recorded as NULL using `@CopyEmptyAsNull` annotation for `CopyCommand`.
 
 ### 1.4.5
 
-- Added support for copy-command to work with array types that are mapped to java.util.Collection derivatives.
+- Added support for `CopyCommand` to work with array types that are mapped to `java.util.Collection` derivatives.
 
 ### 1.4.4
 
 - Reduced scope of provided dependencies.
-- Refactored DAOLite.
-- Fixed issue with AbstractUserType getting null properties.
+- Refactored `DAOLite`.
+- Fixed issue with `AbstractUserType` getting null properties.
 
 ### 1.4.3
 
@@ -330,8 +334,8 @@ Variables created in one script are available to the next script when multiple s
 ### 1.4.2
 
 - Simplified List and Set user types and introduced ability to define if empty list/set should be treated as null or empty array.
-- Copy command records performance stats
-- Introduced DAOLite for cases where simple crud operations are to be performed.
+- `CopyCommand` records performance stats
+- Introduced `DAOLite` for cases where simple crud operations are to be performed.
 
 ### 1.4.1 
 
@@ -358,7 +362,7 @@ Variables created in one script are available to the next script when multiple s
 
 ### 1.3.6
 
-- Modified copy-command support to build copy string automatically.
+- Modified 'CopyCommand' support to build copy string automatically.
 
 ### 1.3.5
 
@@ -367,7 +371,7 @@ Variables created in one script are available to the next script when multiple s
 
 ### 1.3.0
 
-- Added DateTimeAwareDAO to facilitate automatic setting of inserted-on, updated-on type fields. DAOs of entities that want automatic inserted-on/updated-on values populated in create()/update() methods should implement this interface. Methods of the interface may be overridden as necessary. TemporalType.TIMESTAMP and DATE are supported. See the ManufacturerDAO and EmployeeDAO test classes for a simple example.
+- Added `DateTimeAwareDAO` to facilitate automatic setting of inserted-on, updated-on type fields. DAOs of entities that want automatic inserted-on/updated-on values populated in create()/update() methods should implement this interface. Methods of the interface may be overridden as necessary. `TemporalType.TIMESTAMP` and `DATE` are supported. See the `ManufacturerDAO` and `EmployeeDAO` test classes for a simple example.
 
 ### 1.2.1
 
@@ -375,6 +379,6 @@ Variables created in one script are available to the next script when multiple s
 
 ### 1.2.0
 
-- Added support for PostgreSQL bit strings (PostgresqlBitStringUserType).
+- Added support for PostgreSQL bit strings (`PostgresqlBitStringUserType`).
 - Added tests of array (mapping to list and set) and bit string types.
 - Added typical database to Java/JPA hibernate reverse-engineering setup to pom.
