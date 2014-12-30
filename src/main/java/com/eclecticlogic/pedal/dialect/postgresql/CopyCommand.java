@@ -226,6 +226,7 @@ public class CopyCommand {
 
 
     /**
+     * Note: This method is now "ugly" and needs serious refactoring.
      * @param clz
      * @param fieldMethods
      * @return Create a class to generate the copy row strings.
@@ -246,7 +247,16 @@ public class CopyCommand {
             methodBody.append(clz.getName() + " typed = (" + clz.getName() + ")entity;\n");
             for (int i = 0; i < fieldMethods.size(); i++) {
                 Method method = fieldMethods.get(i);
-                if (method.getReturnType().isPrimitive()) {
+                if (method.isAnnotationPresent(CopyConverter.class)) {
+                    try {
+                        Class<?> helper = method.getAnnotation(CopyConverter.class).value();
+                        methodBody.append(helper.getName() + " c" + i + " = (" + helper.getName()
+                                + ")" + helper.getName() + ".class.newInstance();\n");
+                        methodBody.append("builder.append(c" + i + ".convert(typed." + method.getName() + "()));\n");
+                    } catch (Exception e) {
+                        throw Throwables.propagate(e);
+                    }
+                } else if (method.getReturnType().isPrimitive()) {
                     methodBody.append("builder.append(typed." + method.getName() + "());\n");
                 } else {
                     methodBody.append(method.getReturnType().getName() + " v" + i + " = typed." + method.getName()

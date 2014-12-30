@@ -14,12 +14,12 @@ def name = 'pedal'
 
 def i = 0;
 3.times {
-    def tone = table (ExoticTypes, ['login', 'countries', 'authorizations', 'scores']) {
+    def tone = table (ExoticTypes, ['login', 'countries', 'authorizations', 'scores', 'custom']) {
         defaultRow {
             it.status = Status.ACTIVE
             it
         }
-        row "${name}_${i++}", [true, false, true, false, false, false, false], ['create', 'update'], [1, 2, 3, 6, 10]
+        row "${name}_${i++}", [true, false, true, false, false, false, false], ['create', 'update'], [1, 2, 3, 6, 10], 'abc'
     }
     def et = tone[0]
     

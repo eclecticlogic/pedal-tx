@@ -87,6 +87,7 @@ public class TestExoticTypes {
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(1L, 2L, 3L));
         et.setStatus(Status.ACTIVE);
+        et.setCustom("abc");
 
         dao.create(et);
     }
@@ -101,6 +102,7 @@ public class TestExoticTypes {
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(1L, 2L, 3L));
         et.setStatus(Status.INACTIVE);
+        et.setCustom("abc");
 
         dao.create(et);
 
@@ -130,6 +132,7 @@ public class TestExoticTypes {
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList(3L, 7L, 21L));
         et.setStatus(Status.INACTIVE);
+        et.setCustom("abc");
 
         dao.create(et);
 
@@ -147,6 +150,7 @@ public class TestExoticTypes {
         et.setAuthorizations(Sets.newHashSet("a", "b", "b", "c"));
         et.setScores(Lists.newArrayList());
         et.setStatus(Status.INACTIVE);
+        et.setCustom("abc");
 
         dao.create(et);
 
@@ -154,7 +158,7 @@ public class TestExoticTypes {
     }
 
 
-    void testCopyCommand() {
+    public void testCopyCommand() {
         List<ExoticTypes> list = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -168,13 +172,16 @@ public class TestExoticTypes {
                 et.setScores(Lists.newArrayList());
             }
             et.setStatus(Status.ACTIVE);
+            et.setCustom("abc");
             list.add(et);
         }
 
         ExoticTypesDAO dao = getContext().getBean(ExoticTypesDAO.class);
         dao.bulkInsert(list);
         assertTrue(dao.findById("copyCommand0").isPresent());
+        assertEquals(dao.findById("copyCommand0").get().getCustom(), "ABC");
         assertTrue(dao.findById("copyCommand9").isPresent());
+        assertEquals(dao.findById("copyCommand9").get().getCustom(), "ABC");
     }
 
 

@@ -15,6 +15,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
 import com.eclecticlogic.pedal.dialect.postgresql.CopyAsBitString;
+import com.eclecticlogic.pedal.dialect.postgresql.CopyConverter;
 import com.eclecticlogic.pedal.dialect.postgresql.CopyEmptyAsNull;
 import com.eclecticlogic.pedal.provider.hibernate.ArrayType;
 import com.eclecticlogic.pedal.provider.hibernate.dialect.PostgresqlArrayPrimitiveName;
@@ -33,7 +34,8 @@ public class ExoticTypes implements java.io.Serializable {
     private List<Long> scores;
     private List<Long> gpa;
     private Status status;
-
+    private String custom;
+    
 
     @Id
     @Column(name = "login", unique = true, nullable = false)
@@ -110,4 +112,18 @@ public class ExoticTypes implements java.io.Serializable {
         this.status = status;
     }
 
+
+    @CopyConverter(UppercaseConversionHelper.class)
+    @Column(name = "custom", nullable = false)
+    public String getCustom() {
+        return custom;
+    }
+
+
+    
+    public void setCustom(String custom) {
+        this.custom = custom;
+    }
+
+    
 }
