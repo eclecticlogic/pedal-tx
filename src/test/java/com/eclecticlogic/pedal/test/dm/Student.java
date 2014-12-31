@@ -24,14 +24,11 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * @author kabram.
@@ -53,8 +50,6 @@ public class Student implements Serializable {
 
 
     @Id
-    @GenericGenerator(name = "uuid", strategy = "com.eclecticlogic.pedal.provider.hibernate.UUIDBasedIdGenerator")
-    @GeneratedValue(generator = "uuid")
     @Column(name = "student_id", unique = true, nullable = false, length = 36)
     public String getId() {
         return id;

@@ -27,7 +27,6 @@ import com.eclecticlogic.pedal.DataContext;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.test.dm.Manufacturer;
 import com.eclecticlogic.pedal.test.dm.dao.ManufacturerDAO;
-import com.eclecticlogic.pedal.test.dm.dao.StudentDAO;
 
 /**
  * @author kabram.
@@ -130,12 +129,4 @@ public class BasicTest extends AbstractTest {
         assertEquals(dao.getPrimaryKeyProperty(), "name");
     }
 
-
-    public void testTableName() {
-        ManufacturerDAO dao = getContext().getBean(ManufacturerDAO.class);
-        assertEquals(dao.getTableName(), "basic.manufacturer");
-
-        StudentDAO stdao = getContext().getBean(StudentDAO.class);
-        assertEquals(stdao.getTableName(), "basic.graduate_student");
-    }
 }

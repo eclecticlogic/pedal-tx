@@ -7,28 +7,10 @@
         </classes>
     </test>
 
-    <test name="provider">
-        <classes>
-            <class name="com.eclecticlogic.pedal.provider.hibernate.HibernateProviderTest" />
-        </classes>
-    </test>
-
     <test name="crud">
         <classes>
             <class name="com.eclecticlogic.pedal.test.CrudTest" />
         </classes>
     </test>
     
-    <test name="copy">
-        <classes>
-            <class name="com.eclecticlogic.pedal.test.TestCopyCommand" />
-        </classes>
-    </test>
-    
-    <test name="forward">
-        <classes>
-            <class name="com.eclecticlogic.pedal.forward.TestExoticTypes" />
-        </classes>
-    </test>
-
 </suite>

@@ -29,14 +29,4 @@ public class TeacherDAO extends TestDAO<Teacher, Integer> {
         return Teacher.class;
     }
 
-
-    /**
-     * Made public to facilitate testing.
-     * @return
-     */
-    @Override
-    public String getTableName() {
-        return super.getTableName();
-    }
-
 }

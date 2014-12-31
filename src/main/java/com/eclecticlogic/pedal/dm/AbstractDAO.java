@@ -38,7 +38,6 @@ import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import com.eclecticlogic.pedal.ProviderAccess;
 import com.eclecticlogic.pedal.Transaction;
 import com.eclecticlogic.pedal.dm.internal.MetamodelUtil;
 import com.eclecticlogic.pedal.dm.internal.SelectImpl;
@@ -50,7 +49,6 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     private Transaction transaction;
     private EntityManager entityManager;
     private DateTimeProvider dateTimeProvider;
-    private ProviderAccess providerAccess;
     private boolean insertDateTimeAware, insertDateAware, updateDateTimeAware, updateDateAware, updateDTRequired;
 
 
@@ -141,22 +139,6 @@ public abstract class AbstractDAO<E extends Serializable, P extends Serializable
     }
 
 
-    protected ProviderAccess getProviderAccess() {
-        return providerAccess;
-    }
-
-
-    public void setProviderAccess(ProviderAccess providerAccess) {
-        this.providerAccess = providerAccess;
-    }
-
-
-    /**
-     * @return The name of the entity's database table. This returns the overridden name if orm.xml modifies it. 
-     */
-    protected String getTableName() {
-        return getProviderAccess().getTableName(getEntityClass());
-    }
 
 
     @Override

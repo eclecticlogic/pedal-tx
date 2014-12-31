@@ -16,12 +16,6 @@
  */
 package com.eclecticlogic.pedal.test.dm.dao;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
-import com.eclecticlogic.pedal.dialect.postgresql.CopyCommand;
-import com.eclecticlogic.pedal.dialect.postgresql.CopyList;
 import com.eclecticlogic.pedal.test.dm.Student;
 
 /**
@@ -30,34 +24,9 @@ import com.eclecticlogic.pedal.test.dm.Student;
  */
 public class StudentDAO extends TestDAO<Student, String> {
 
-    @Inject
-    private CopyCommand copyCommand;
-
-
-    public void setCopyCommand(CopyCommand copyCommand) {
-        this.copyCommand = copyCommand;
-    }
-
-
     @Override
     public Class<Student> getEntityClass() {
         return Student.class;
     }
 
-
-    /**
-     * Made public to facilitate testing.
-     * @return
-     */
-    @Override
-    public String getTableName() {
-        return super.getTableName();
-    }
-
-
-    public void bulkInsert(List<Student> students) {
-        getTransaction().run(() -> {
-            copyCommand.insert(getEntityManager(), new CopyList<Student>(students));
-        });
-    }
 }

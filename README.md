@@ -3,7 +3,7 @@ Pedal
 
 A Java 8 based idiomatic JPA DAO framework. Let the examples say the rest.
 
-# Feature Highlights
+## Feature Highlights
 
 - Advanced transaction management
 	- Lambda based transaction boundary
@@ -14,13 +14,6 @@ A Java 8 based idiomatic JPA DAO framework. Let the examples say the rest.
     - Simple integration with QueryDSL	
     - Hooks to set insert/update date/time automatically
     - DAO registry function for dynamic CRUD operations
-- Postgresql specific features
-	- Support for COPY to insert data using collection of JPA entities
-	- Hibernate user-types for Postgres arrays
-	- Hibernate user-type for Postgres bit array  
-- Data loader support
-	- Simple groovy DSL for defining test data to be loaded
-	- Works at the JPA entity level (not database columns and values but JPA entity properties and "converted" types). 
 	 
 # Getting started
 
@@ -29,17 +22,15 @@ Download the Pedal jar from Maven central:
 ```
 	<groupId>com.eclecticlogic</groupId>
 	<artifactId>pedal</artifactId>
-	<version>1.4.1</version>
+	<version>1.5.0</version>
 ```
 
 Minimum dependencies that you need to provide in your application:
 
 1. slf4j (over logback or log4j) v1.7.7 or higher
 2. spring-tx, spring-context and spring-orm v4.0 or higher
-3. JTA v 1.1
 4. hibernate-core and hibernate-entitymanager 4.3 or higher.
 5. JDBC4 compliant driver and connection pool manager (BoneCP recommended).
-6. For data loader: groovy-all 2.3 or above
 
 # Configuration
 
@@ -86,11 +77,6 @@ The typical Spring based wiring of a DAO (with an application specific parent DA
 
 	<bean id="tx" class="com.eclecticlogic.pedal.impl.TransactionImpl">
 		<property name="platformTransactionManager" ref="ptf" />
-	</bean>
-	
-	<!-- Optional provider-api -->
-	<bean id="hibernateProviderAccess" class="com.eclecticlogic.pedal.provider.hibernate.HibernateProviderAccessSpiImpl">
-		<property name="entityManagerFactory" ref="emf" />
 	</bean>
 	
     <bean id="abstractDAO" abstract="true" class="com.myapp.AppDAO">
@@ -166,7 +152,7 @@ The Pedal Transaction object allows programmatic transaction delineation alongsi
 
 ## Transaction attached objects
 
-The real power of the Pedal Transaction is in its ability to attach data and jobs to the current transaction. To enable this feature, you must use Pedal's JPATransactionWrapper instead of Spring's JPATransactionManager. Here is an example of setting and retrieving transaction attached data:
+Pedal allows you to attach data and jobs to the current transaction. To enable this feature, you must use Pedal's JPATransactionWrapper instead of Spring's JPATransactionManager. Here is an example of setting and retrieving transaction attached data:
 
 ```
 	public void setupData() {
@@ -204,66 +190,11 @@ Transaction attached jobs allow you to fire code either just before and just aft
    }
 ```
 
-# Provider Features
-
-Pedal currently implements support for Hibernate and allows access to the ProviderAccess interface from within the DAOs. This interface provides access to the current schema name and the table name (including overridden names in orm.xml) for entities.
-
-# Data Loader
-
-The pedal data loader is accessed via the Loader interface. Create an instance of LoaderImpl providing it with a reference to the dao registry. Create your load script in one or more groovy scripts in your classpath.
-
-The Loader interface allows you to specify inputs to the script. The inputs are in the form of a map of objects to String keys. The keys will be available as variables in your script.
-The loader also allows you to specify a directory (in the classpath) where all your scripts reside. All references to scripts can then be relative to that directory.
-
-Call the load method passing in one or more scripts to load and execute. Any inputs defined are passed to all the scripts. The loader also allows you to define namespaces so that output variables from scripts are separate. A variable called x created by a script with a namespace of a can be accessed in subsequent scripts as a.x. In the returned Map, the key "a" has a map of variables, one of which is x. 
-
-## Loader script format
-
-The loader works using a typical groovy script with a special syntax for defining tables to load. The script can contain import statements, variable definitions, etc. Any properties defined in the script (essentially a variable without a def) will be available in the map returned by the Loader.load() method. This can be used to get specific objects or ids to test against.
-
-### Table load definition
-
-To insert rows into a table, use the table() method. The method takes two parameters and a closure:
-
-Class reference of JPA entity
-List of attributes you want to define.
-
-The method returns a list of entities created in the closure.
-
-The closure should have one more more lines of the format:
-
-row << [<value1>, <value2>, ...]
-
-The values are what you'd populate in the JPA entity, not in the database. So for a foreign key, you'd pass the @JoinColumn object. For a character field mapped to an Enum, you'd pass the actual Enum
-
-Here is an example of a simple script to populate a table and then a child table:
-
-```
-	import com.test.School
-    import com.test.Student
-	import com.test.SchoolType
-    import com.test.Gender
-
-	table(School, [name, type, address]) {
-		row 'Lee Elementary', SchoolType.ELEMENTARY, '1 Lee Rd'
-		row 'Park View School', SchoolType.MIDDLE, '10 Elm Street'
-		highSchool = row 'Mountain Top High', SchoolType.HIGH, '12 Dream Street'
-	} 
-
-	println highSchool.id
-
-    table(Student, [name, gender, school]) {
-		row 'Joe Schmuckately', Gender.MALE, highSchool
-    }
-
-	find(Student, 1)
-```   
-
-The above script creates three rows in the school table and also prints the database assigned id of the highSchool. The highSchool object can now be accessed from the map of variables returned by the load() method using the key "highSchool".  
-
-Variables created in one script are available to the next script when multiple scripts are passed to the same load() call. The find method can be used to retrieve data that has been created by primary key.
-
 # Release notes
+
+### 1.5.0
+
+- Major refactoring. Pedal is now pedal-tx, pedal-dialect and pedal-loader; three separate projects. Dialect and loader specific functionality have been separated to allow for more granular use.
 
 ### 1.4.18
  

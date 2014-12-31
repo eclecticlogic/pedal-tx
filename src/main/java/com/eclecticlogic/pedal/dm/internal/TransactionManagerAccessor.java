@@ -22,8 +22,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 
-import com.eclecticlogic.pedal.spi.ProviderAccessSpi;
-
 /**
  * This interface provides access to common methods provided by JPA and JTA transaction managers. Some of these are 
  * present in the PlatformTransactionManager class but that is too broad. Therefore only methods of interest are 
@@ -50,9 +48,5 @@ public interface TransactionManagerAccessor {
 
     public TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException;
 
-    
-    /**
-     * @return Access to underlying provider access implementation.
-     */
-    public ProviderAccessSpi getProviderAccessSpi();
+   
 }

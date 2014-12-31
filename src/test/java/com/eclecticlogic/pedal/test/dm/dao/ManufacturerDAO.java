@@ -65,13 +65,4 @@ public class ManufacturerDAO extends TestDAO<Manufacturer, String> implements Te
         return getIdProperty();
     }
 
-
-    /**
-     * Made public to facilitate testing.
-     * @return
-     */
-    @Override
-    public String getTableName() {
-        return super.getTableName();
-    }
 }

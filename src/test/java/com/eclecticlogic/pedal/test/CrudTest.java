@@ -276,6 +276,7 @@ public class CrudTest extends AbstractTest {
 
         StudentDAO sdao = getContext().getBean(StudentDAO.class);
         Student student = new Student();
+        student.setId("101a");
         student.setGrade(Grade.A);
         student.setName("Joe");
         student.setZone("AZ");
