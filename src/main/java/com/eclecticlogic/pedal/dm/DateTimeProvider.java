@@ -24,11 +24,9 @@ import java.util.Date;
 /**
  * DAOs that have this provider are able to automatically set inserted and updated timestamps on the entity
  * in a create() or save() call.
- * This is called out as a provider interface so that the implementer can provide their own way of determining 
- * current date/time (such a strategy helps in testing).
- * 
+ *  * 
  * It is recommended that an application-level base DAO that derives from AbstractDAO be the one that sets the provider 
- * to a specific implementation (a derivative of this class per required customizations). When this provider is set, 
+ * to a specific implementation (a derivative of this class with required customizations). When this provider is set, 
  * the application's base DAO should call AbstractDAO.init() via dependency-injection (e.g. @PostContruct annotation 
  * on an override of init() that simply calls super.init) or other means (e.g. init property of Spring bean definition).
  * 
