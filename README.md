@@ -87,6 +87,25 @@ The typical Spring based wiring of a DAO (with an application specific parent DA
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.StudentDAO" />
 ``` 
 
+When using Spring Boot, setup your beans as shown below (it is important to override the default PlatformTransactionManager):
+
+```
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory factory) {
+        JPATransactionWrapper wrapper = new JPATransactionWrapper();
+        wrapper.setEntityManagerFactory(factory);
+        return wrapper;
+    }
+
+
+    @Bean
+    public Transaction transaction(PlatformTransactionManager manager) {
+        TransactionImpl transaction = new TransactionImpl();
+        transaction.setPlatformTransactionManager(manager);
+        return transaction;
+    }
+```
+
 # Usage
 
 ### Create, Update, Delete
