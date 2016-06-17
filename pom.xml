@@ -102,7 +102,7 @@
                     <version>3.1</version>
                     <configuration>
                         <fork>true</fork>
-                        <executable>${JAVA_8_HOME}/bin/javac</executable>
+                        <executable>${JAVA_HOME}/bin/javac</executable>
                         <compilerVersion>1.8</compilerVersion>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -139,7 +139,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.17</version>
                 <configuration>
-                    <jvm>${JAVA_8_HOME}/bin/java</jvm>
+                    <jvm>${JAVA_HOME}/bin/java</jvm>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/pedal-testng-suite.xml</suiteXmlFile>
                     </suiteXmlFiles>
