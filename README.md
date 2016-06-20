@@ -215,6 +215,10 @@ Transaction attached jobs allow you to fire code either just before and just aft
 
 # Release notes
 
+### 1.5.1
+
+- Made all dependencies 'provided' in scope.
+
 ### 1.5.0
 
 - Major refactoring. Pedal is now pedal-tx, pedal-dialect and pedal-loader; three separate projects. Dialect and loader specific functionality have been separated to allow for more granular use.
