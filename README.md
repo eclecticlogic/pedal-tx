@@ -1,7 +1,7 @@
 Pedal-tx
 =====
 
-Peda-tx, a member of the Pedal family ([pedal-dialect](https://github.com/eclecticlogic/pedal-dialect), [pedal-loader](https://github.com/eclecticlogic/pedal-loader)), is a Java 8 based idiomatic JPA DAO framework. 
+Pedal-tx, a member of the Pedal family ([pedal-dialect](https://github.com/eclecticlogic/pedal-dialect), [pedal-loader](https://github.com/eclecticlogic/pedal-loader)), is a Java 8 based idiomatic JPA DAO framework. 
 
 ## Feature Highlights
 
