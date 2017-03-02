@@ -1,0 +1,8 @@
+title: Pedal-tx
+description: A Java 8 based idiomatic JPA DAO framework. Let the examples say the rest.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-tactile
+
+gems:
+  - jekyll-mentions
