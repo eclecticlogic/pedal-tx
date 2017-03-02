@@ -1,7 +1,7 @@
 Pedal-tx
 =====
 
-Peda-tx, a member of the Pedal family ([pedal-dialect](https://github.com/eclecticlogic/pedal-dialect), [pedal-loader](https://github.com/eclecticlogic/pedal-loader)), is a Java 8 based idiomatic JPA DAO framework. 
+Pedal-tx, a member of the Pedal family ([pedal-dialect](https://github.com/eclecticlogic/pedal-dialect), [pedal-loader](https://github.com/eclecticlogic/pedal-loader)), is a Java 8 based idiomatic JPA DAO framework. 
 
 ## Feature Highlights
 
@@ -86,6 +86,25 @@ The typical Spring based wiring of a DAO (with an application specific parent DA
 
 	<bean parent="abstractDAO" class="com.eclecticlogic.pedal.test.dm.dao.StudentDAO" />
 ``` 
+
+When using Spring Boot, setup your beans as shown below (it is important to override the default PlatformTransactionManager):
+
+```
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory factory) {
+        JPATransactionWrapper wrapper = new JPATransactionWrapper();
+        wrapper.setEntityManagerFactory(factory);
+        return wrapper;
+    }
+
+
+    @Bean
+    public Transaction transaction(PlatformTransactionManager manager) {
+        TransactionImpl transaction = new TransactionImpl();
+        transaction.setPlatformTransactionManager(manager);
+        return transaction;
+    }
+```
 
 # Usage
 
@@ -196,7 +215,10 @@ Transaction attached jobs allow you to fire code either just before and just aft
 
 # Release notes
 
+### 1.5.1
+
+- Made all dependencies 'provided' in scope.
+
 ### 1.5.0
 
 - Major refactoring. Pedal is now pedal-tx, pedal-dialect and pedal-loader; three separate projects. Dialect and loader specific functionality have been separated to allow for more granular use.
-
